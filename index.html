@@ -7,10 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-  
-  <!-- LINE LIFF SDK -->
-  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
   <style>
     :root {
       --primary: #0284c7;
@@ -56,6 +52,7 @@
       padding: 32px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border);
+      position: relative;
     }
 
     .header {
@@ -286,7 +283,7 @@
       justify-content: center;
       gap: 10px;
       width: 100%;
-      padding: 13px 20px;
+      padding: 14px 20px;
       border-radius: 10px;
       font-size: 1rem;
       font-weight: 600;
@@ -305,26 +302,51 @@
       background-color: var(--line-green-hover);
     }
 
-    .btn-share {
-      background-color: #f1f5f9;
-      color: #334155;
-      border: 1px solid var(--border);
+    .btn-copy-result {
+      background-color: #0284c7;
+      color: white;
     }
 
-    .btn-share:hover {
-      background-color: #e2e8f0;
+    .btn-copy-result:hover {
+      background-color: #0369a1;
     }
 
     .btn-restart {
       background-color: transparent;
       color: var(--text-muted);
       border: 1px dashed var(--border);
-      padding: 11px 20px;
+      padding: 12px 20px;
     }
 
     .btn-restart:hover {
       background-color: #f8fafc;
       color: var(--text-main);
+    }
+
+    /* Toast Notification */
+    .toast {
+      visibility: hidden;
+      min-width: 280px;
+      background-color: #0f172a;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px 20px;
+      position: fixed;
+      z-index: 9999;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .toast.show {
+      visibility: visible;
+      opacity: 1;
     }
 
     @media (max-width: 540px) {
@@ -390,26 +412,24 @@
 
       <!-- Actions -->
       <div class="action-buttons-container">
-        <!-- Option 1: Send to LINE OA -->
-        <button id="send-line-btn" class="btn-action btn-line-oa" onclick="sendResultToLine()">
+        <!-- 1. Send to LINE OA -->
+        <button id="send-line-btn" class="btn-action btn-line-oa" onclick="handleSendToLine()">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 5.92 2 10.74c0 3.29 2.11 6.17 5.29 7.63-.23.86-.82 3.12-.94 3.6-.14.56.2.55.43.4.17-.11 2.37-1.61 3.33-2.27.61.09 1.24.14 1.89.14 5.52 0 10-3.92 10-8.74S17.52 2 12 2z"/>
           </svg>
           ส่งผลประเมินเข้า LINE Official Account
         </button>
 
-        <!-- Option 3: Share (With Hashtags) -->
-        <button id="share-btn" class="btn-action btn-share" onclick="shareResult()">
+        <!-- 2. Copy Text for Other Apps -->
+        <button id="copy-result-btn" class="btn-action btn-copy-result" onclick="copyResultText()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="18" cy="5" r="3"></circle>
-            <circle cx="6" cy="12" r="3"></circle>
-            <circle cx="18" cy="19" r="3"></circle>
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
-          แชร์ผลลัพธ์ (Share)
+          คัดลอกข้อความสรุปผล (พร้อมแชร์แอปอื่น)
         </button>
 
+        <!-- 3. Restart Quiz -->
         <button id="restart-btn" class="btn-action btn-restart" onclick="restartQuiz()">
           ทำแบบทดสอบอีกครั้ง
         </button>
@@ -417,20 +437,14 @@
     </div>
   </div>
 
+  <div id="toast" class="toast">คัดลอกข้อความผลลัพธ์เรียบร้อยแล้ว! พร้อมวางในแอปอื่นทันที</div>
+
   <script>
     // ==========================================
-    // ⚙️ LINE CONFIGURATION
+    // ⚙️ CONFIGURATION
     // ==========================================
-    // ระบุ LINE OA ID ของคุณ (จะใส่หรือไม่ใส่ @ ก็ได้ ระบบจะจัดการ encode ให้ถูกต้อง)
+    // ใส่ LINE OA ID ของ Dansai Group (มี @ หรือไม่มีก็ได้)
     const LINE_OA_ID = "@dansaigroup"; 
-
-    // ใส่ LIFF ID หากต้องการรันแบบ In-app LIFF (ถ้าไม่มีให้เว้นว่าง "")
-    const LIFF_ID = ""; 
-
-    // Initialize LIFF if ID is present
-    if (LIFF_ID && typeof liff !== "undefined") {
-      liff.init({ liffId: LIFF_ID }).catch(err => console.log("LIFF Init Error:", err));
-    }
 
     const questions = [
       // Part 1: Basic Food Hygiene
@@ -692,19 +706,19 @@
         p1El.innerText = "จุดเริ่มต้นที่ดี! การเข้าร่วมกิจกรรมในวันนี้จะช่วยอุดรอยต่อเรื่องช่วงอุณหภูมิอันตราย (TDZ) และการสกัดการปนเปื้อนข้ามได้อย่างสมบูรณ์";
       }
 
-      // Feedback Part 2 (Dansai Consultation Guidance)
+      // Feedback Part 2
       const p2El = document.getElementById("part2-feedback-text");
       if (scorePart2 === 5) {
         p2El.innerText = "ระดับยอดเยี่ยม! คุณเห็นภาพประโยชน์ของนวัตกรรมดิจิทัลเพื่อความปลอดภัยอาหารอย่างชัดเจน หากต้องการต่อยอดวางระบบ AD9 หรือ Real-time Monitoring เพื่อเตรียมพร้อมรับรองมาตรฐาน SAN / SAN+ ทีมงาน Dansai Group ยินดีให้คำปรึกษาและออกแบบระบบร่วมกับคุณครับ";
       } else if (scorePart2 >= 3) {
         p2El.innerText = "ระดับดี! คุณเข้าใจแนวคิดหลักในการใช้นวัตกรรมสกัดความเสี่ยงอาหารได้เป็นอย่างดี สำหรับการใช้แดชบอร์ดจริงเพื่อลดต้นทุนแฝง ทีม Dansai Group พร้อมให้คำแนะนำและพาทดลองใช้เครื่องมือเพิ่มเติมเพื่อยกระดับครัวสู่มาตรฐานสากลครับ";
       } else {
-        p2El.innerText = "จุดเริ่มต้นที่ดี! เทคโนโลยีด้านความปลอดภัยอาหารยุคใหม่ยังมีรายละเอียดที่น่าสนใจอีกมาก หากต้องการปูพื้นฐานแนวคิด หรือเตรียมรับมาตรฐาน SAN / SAN+ ให้ผ่านฉลุย สามารถปรึกษาและขอรับบริการตรวจประเมินเบื้องต้นกับทีมผู้เชี่ยวชาญ Dansai Group ได้เลยครับ";
+        p2El.innerText = "เริ่มต้นได้ดี! เทคโนโลยีด้านความปลอดภัยอาหารยุคใหม่ยังมีรายละเอียดที่น่าสนใจอีกมาก หากต้องการปูพื้นฐานแนวคิด หรือเตรียมรับมาตรฐาน SAN / SAN+ ให้ผ่านฉลุย สามารถปรึกษาและขอรับบริการตรวจประเมินเบื้องต้นกับทีมผู้เชี่ยวชาญ Dansai Group ได้เลยครับ";
       }
     }
 
-    // Build Formatted Result Message with Hashtags
-    function generateResultMessage() {
+    // Build the formatted text output
+    function getSummaryPayload() {
       const totalScore = scorePart1 + scorePart2;
       const totalQuestions = questions.length;
       const percentTotal = Math.round((totalScore / totalQuestions) * 100);
@@ -720,58 +734,64 @@
 #DansaiGroup #VServeSafe #AD9 #FoodSafety #FoodSafetyCulture #Hospitality #Hotel #Restaurant`;
     }
 
-    // 🟢 OPTION 1: Send to LINE Official Account (Fixed)
-    function sendResultToLine() {
-      const message = generateResultMessage();
-
-      // Case A: Inside LINE In-App Browser with LIFF support
-      if (typeof liff !== "undefined" && liff.isLoggedIn && liff.isLoggedIn() && liff.isInClient && liff.isInClient()) {
-        liff.sendMessages([{
-          type: "text",
-          text: message
-        }]).then(() => {
-          alert("ส่งผลประเมินเข้าแชทเรียบร้อยแล้วครับ!");
-        }).catch(err => {
-          fallbackToLineOA(message);
-        });
-        return;
-      }
-
-      // Case B: External Mobile / Desktop Browser fallback
-      fallbackToLineOA(message);
+    // Toast helper
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      if (msg) toast.innerText = msg;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3500);
     }
 
-    function fallbackToLineOA(message) {
-      // Clean LINE ID: remove leading '@' and format with %40
-      const cleanId = LINE_OA_ID.replace(/^@/, "");
-      
-      if (!cleanId) {
-        // If no OA ID is provided, open LINE Share sheet
-        window.location.href = `https://line.me/R/share?text=${encodeURIComponent(message)}`;
-        return;
-      }
-
-      // Official LINE Scheme format: https://line.me/R/oaMessage/{%40LINE_ID}/?{message}
-      const targetUrl = `https://line.me/R/oaMessage/%40${cleanId}/?${encodeURIComponent(message)}`;
-      window.location.href = targetUrl;
-    }
-
-    // 🔗 OPTION 3: Share (Native Share or Clipboard)
-    function shareResult() {
-      const message = generateResultMessage();
-
-      if (navigator.share) {
-        navigator.share({
-          title: "ผลการประเมิน Food Safety & AD9",
-          text: message
-        }).catch(err => console.log("Share dismissed"));
+    // Robust Clipboard Copy Function
+    function executeCopy(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
       } else {
-        navigator.clipboard.writeText(message).then(() => {
-          alert("คัดลอกผลคะแนนพร้อมแฮชแท็กเรียบร้อยแล้ว สามารถนำไปวางในแชทได้ทันทีครับ!");
-        }).catch(() => {
-          alert("ไม่สามารถแชร์ได้ กรุณาลองใหม่อีกครั้ง");
+        // Fallback for older browsers / http contexts
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        return new Promise((resolve, reject) => {
+          document.execCommand('copy') ? resolve() : reject();
+          textArea.remove();
         });
       }
+    }
+
+    // 🟢 1. Send to LINE OA (Auto-copies result + launches LINE app & target chat)
+    function handleSendToLine() {
+      const payload = getSummaryPayload();
+      const cleanId = LINE_OA_ID.replace(/^@/, "");
+
+      // Step 1: Copy to clipboard immediately to ensure user never loses text
+      executeCopy(payload).catch(e => console.log(e));
+
+      // Step 2: Open LINE chat directly with fallback
+      // https://line.me/R/oaMessage/ launches native LINE chat with draft message
+      const oaUrl = `https://line.me/R/oaMessage/%40${cleanId}/?${encodeURIComponent(payload)}`;
+      
+      showToast("กำลังเปิด LINE... (หากข้อความไม่ขึ้น สามารถกดวาง Paste ได้เลยครับ)");
+
+      // Use window.location to trigger native app intent
+      setTimeout(() => {
+        window.location.href = oaUrl;
+      }, 400);
+    }
+
+    // 📋 2. Copy Result Text (Ready to paste anywhere)
+    function copyResultText() {
+      const payload = getSummaryPayload();
+      executeCopy(payload).then(() => {
+        showToast("คัดลอกข้อความสรุปผลเรียบร้อยแล้ว! พร้อมวางในแอปอื่นทันที");
+      }).catch(() => {
+        alert("ไม่สามารถคัดลอกอัตโนมัติได้ กรุณาลองใหม่อีกครั้ง");
+      });
     }
 
     function restartQuiz() {
@@ -783,7 +803,7 @@
       loadQuestion();
     }
 
-    // Start
+    // Initialize
     loadQuestion();
   </script>
 </body>
