@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Safety & AD9 Solutions Quiz</title>
+  <title>Food Safety & AD9 Solutions Interactive Quiz</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- LINE LIFF SDK v2 -->
@@ -11,14 +11,19 @@
 </head>
 <body class="bg-slate-100 min-h-screen flex items-center justify-center p-3 sm:p-4 font-sans text-slate-800">
 
-  <div class="w-full max-w-md bg-white rounded-3xl shadow-sm p-6 flex flex-col justify-between min-h-[560px]">
+  <main class="w-full max-w-md bg-white rounded-3xl shadow-sm p-6 flex flex-col justify-between min-h-[580px]">
     
     <!-- User Profile Header -->
-    <header class="flex items-center gap-3 border-b border-slate-100 pb-3">
-      <img id="user-avatar" class="w-10 h-10 rounded-full bg-slate-200 hidden object-cover border border-slate-200" alt="Avatar">
-      <div>
-        <p class="text-[11px] text-slate-400 font-medium">ผู้เข้าทำแบบทดสอบ</p>
-        <p id="user-name" class="font-semibold text-sm text-slate-800">กำลังโหลดข้อมูล...</p>
+    <header class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div class="flex items-center gap-3">
+        <img id="user-avatar" class="w-10 h-10 rounded-full bg-slate-200 hidden object-cover border border-slate-200" alt="Avatar">
+        <div>
+          <p class="text-[11px] text-slate-400 font-medium">ผู้เข้าทำแบบทดสอบ</p>
+          <p id="user-name" class="font-semibold text-sm text-slate-800">กำลังโหลดข้อมูล...</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500">Interactive Quiz</span>
       </div>
     </header>
 
@@ -29,7 +34,7 @@
         <span id="section-badge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
           ส่วนที่ 1: พื้นฐาน Food Safety
         </span>
-        <span id="question-progress" class="font-medium text-slate-500">1 / 4</span>
+        <span id="question-progress" class="font-medium text-slate-500">1 / 11</span>
       </div>
 
       <div id="category-badge" class="inline-block text-[11px] font-medium text-slate-500 mb-2">
@@ -39,33 +44,36 @@
       <div id="choices-container" class="space-y-2.5"></div>
     </section>
 
-    <!-- Quiz Result & Evaluation Section -->
+    <!-- Quiz Result & Deep Evaluation Section -->
     <section id="result-area" class="hidden my-auto py-2">
-      <!-- Summary Score -->
+      <!-- Summary Header -->
       <div class="text-center mb-3">
-        <div class="text-4xl mb-1">📋</div>
+        <div id="result-icon" class="text-4xl mb-1">📋</div>
         <h2 class="text-xl font-bold text-slate-900">สรุปผลการประเมิน</h2>
-        <div id="final-score" class="text-3xl font-extrabold text-emerald-600 my-1">0 / 0</div>
+        <div id="final-score" class="text-3xl font-extrabold text-emerald-600 my-1">0 / 11</div>
+        <p id="overall-feedback" class="text-xs text-slate-600 font-medium px-2 py-1.5 bg-slate-100 rounded-lg inline-block">
+          กำลังคำนวณผล...
+        </p>
       </div>
 
       <!-- Evaluation Breakdown (Part 1 & Part 2) -->
-      <div class="space-y-2.5 mb-4">
-        <!-- Part 1 Box -->
+      <div class="space-y-2.5 mb-4 text-left">
+        <!-- Part 1 Review Box -->
         <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-slate-700">ส่วนที่ 1: พื้นฐาน Food Safety</span>
-            <span id="score-part1" class="text-xs font-semibold text-emerald-600">0/2</span>
+            <span class="text-xs font-bold text-slate-700">ส่วนที่ 1: พื้นฐาน Food Safety (6 ข้อ)</span>
+            <span id="score-part1" class="text-xs font-semibold text-emerald-600">0/6</span>
           </div>
           <p id="eval-part1" class="text-xs text-slate-600 leading-relaxed font-normal">
             กำลังประเมิน...
           </p>
         </div>
 
-        <!-- Part 2 Box (AD9 Solutions) -->
+        <!-- Part 2 Review Box (AD9 Solutions) -->
         <div class="p-3 bg-indigo-50/70 rounded-2xl border border-indigo-100">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-indigo-900">ส่วนที่ 2: มาตรฐานและการประยุกต์ใช้ AD9 Solutions</span>
-            <span id="score-part2" class="text-xs font-semibold text-indigo-600">0/2</span>
+            <span class="text-xs font-bold text-indigo-900">ส่วนที่ 2: โซลูชันและการจัดการ AD9 (5 ข้อ)</span>
+            <span id="score-part2" class="text-xs font-semibold text-indigo-600">0/5</span>
           </div>
           <p id="eval-part2" class="text-xs text-indigo-950 leading-relaxed font-normal">
             กำลังประเมิน...
@@ -89,60 +97,147 @@
       </button>
     </section>
 
-  </div>
+  </main>
 
   <script>
-    // ** แทนที่ด้วย LIFF ID ของคุณ **
+    // ** แทนที่ด้วย LIFF ID ของคุณที่สร้างไว้ **
     const MY_LIFF_ID = "YOUR_LIFF_ID_HERE";
 
+    // ชุดคำถาม 11 ข้อ (ส่วนที่ 1 = 6 ข้อ, ส่วนที่ 2 = 5 ข้อ)
     const quizData = [
-      // --- ส่วนที่ 1: มาตรฐานพื้นฐาน Food Safety ---
+      // ==================== ส่วนที่ 1: พื้นฐาน Food Safety (6 ข้อ) ====================
       {
         part: 1,
         partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
         category: "การควบคุมอุณหภูมิ (Temperature Danger Zone)",
-        question: "ช่วงอุณหภูมิ Danger Zone ที่เชื้อแบคทีเรียเจริญเติบโตได้รวดเร็วและเป็นอันตรายที่สุดคือช่วงใด?",
+        question: "1. ช่วงอุณหภูมิ Temperature Danger Zone ที่เชื้อจุลินทรีย์แบ่งตัวได้รวดเร็วที่สุดคือช่วงใด?",
         choices: ["-18°C ถึง 0°C", "5°C ถึง 60°C", "65°C ถึง 100°C", "100°C ขึ้นไป"],
         answer: 1
       },
       {
         part: 1,
         partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
-        category: "การปนเปื้อนข้าม (Cross-Contamination)",
-        question: "แนวทางปฏิบัติที่ถูกต้องเพื่อป้องกัน Cross-Contamination ในกระบวนการเตรียมอาหารคือข้อใด?",
+        category: "การป้องกันการปนเปื้อนข้าม (Cross-Contamination)",
+        question: "2. การจัดเก็บอาหารในตู้เย็นตามหลักสุขอนามัย ควรวางอาหารประเภทใดไว้ชั้นล่างสุดเสมอ?",
         choices: [
-          "แยกอุปกรณ์และเขียงตามโค้ดสีอย่างเคร่งครัด",
-          "ใช้ผ้าสะอาดผืนเดียวกันเช็ดมีดทุกเล่มเพื่อความรวดเร็ว",
-          "ล้างเขียงด้วยน้ำเปล่าธรรมดาแล้วหั่นอาหารต่อได้ทันที",
-          "วางเนื้อสัตว์ดิบไว้ชั้นบนสุดในตู้เย็นเหนืออาหารปรุงสุก"
+          "อาหารพร้อมรับประทาน (Ready-to-eat)",
+          "เบเกอรี่และของหวาน",
+          "เนื้อสัตว์และสัตว์ปีกดิบ (Raw Poultry/Meat)",
+          "ผักและผลไม้ที่ล้างแล้ว"
+        ],
+        answer: 2
+      },
+      {
+        part: 1,
+        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
+        category: "สุขอนามัยส่วนบุคคล (Personal Hygiene)",
+        question: "3. ขั้นตอนการล้างมือที่ได้มาตรฐานของพนักงานสัมผัสอาหาร ควรใช้เวลาถูสบู่อย่างน้อยกี่วินาที?",
+        choices: ["5 วินาที", "10 วินาที", "อย่างน้อย 20 วินาที", "60 วินาที"],
+        answer: 2
+      },
+      {
+        part: 1,
+        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
+        category: "การจัดเก็บและหมุนเวียนสินค้า (Stock Rotation)",
+        question: "4. หลักการ 'FIFO' (First-In, First-Out) มีเป้าหมายสำคัญที่สุดในการจัดการวัตถุดิบอย่างไร?",
+        choices: [
+          "ใช้วัตถุดิบที่รับเข้ามาก่อนหรือมีอายุคงเหลือน้อยกว่าก่อน เพื่อลดของหมดอายุ",
+          "จัดวางของที่มีน้ำหนักมากไว้ข้างหน้าเสมอ",
+          "ใช้วัตถุดิบใหม่ล่าสุดก่อนเพื่อให้ได้ความสด",
+          "เน้นประหยัดพื้นที่จัดเก็บโดยไม่คำนึงถึงวันหมดอายุ"
         ],
         answer: 0
+      },
+      {
+        part: 1,
+        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
+        category: "การทำละลายอาหารแช่แข็ง (Thawing Methods)",
+        question: "5. วิธีการทำละลายอาหารแช่แข็ง (Thawing) ข้อใดถือว่าปลอดภัยและถูกต้องตามมาตรฐาน?",
+        choices: [
+          "แช่ทิ้งไว้ในอ่างน้ำอุ่นที่อุณหภูมิห้องข้ามคืน",
+          "วางทิ้งไว้บนเคาน์เตอร์ในครัวที่อุณหภูมิห้อง",
+          "ย้ายลงมาทำละลายในตู้แช่เย็น (Chiller) ที่อุณหภูมิต่ำกว่า 4°C ล่วงหน้า",
+          "นำไปตากแดดเพื่อให้ละลายเร็วขึ้น"
+        ],
+        answer: 2
+      },
+      {
+        part: 1,
+        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
+        category: "การควบคุมสารก่อภูมิแพ้ (Allergen Control)",
+        question: "6. เมื่อลูกค้าแจ้งว่าแพ้อาหารเฉพาะกลุ่ม ข้อปฏิบัติใดที่ครัวต้องระมัดระวังสูงสุด?",
+        choices: [
+          "ใช้น้ำมันกระทะเดิมทอดเพื่อความหอม",
+          "แยกอุปกรณ์ กระทะ และภาชนะเฉพาะเพื่อป้องกันการปนเปื้อนข้ามของสารก่อภูมิแพ้",
+          "ตักส่วนผสมที่แพ้ออกด้วยช้อนก่อนเสิร์ฟ",
+          "ปรุงอาหารตามปกติเพราะความร้อนสูงสามารถทำลายสารก่อภูมิแพ้ได้"
+        ],
+        answer: 1
       },
 
-      // --- ส่วนที่ 2: โซลูชันและการจัดการ AD9 Solutions ---
+      // ==================== ส่วนที่ 2: โซลูชันและการจัดการ AD9 (5 ข้อ) ====================
       {
         part: 2,
-        partName: "ส่วนที่ 2: โซลูชัน AD9 by Dansai Group",
-        category: "การตรวจประเมินและที่ปรึกษา (Consulting & Audit)",
-        question: "บทบาทสำคัญของ AD9 Solutions ในการช่วยสถานประกอบการอาหารและโรงแรมคือข้อใด?",
+        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
+        category: "บทบาทของ AD9 Solutions (Overview & Role)",
+        question: "7. บทบาทหลักของ AD9 Solutions ภายใต้ Dansai Group ในธุรกิจอาหารและการบริการคือข้อใด?",
         choices: [
-          "เป็นที่ปรึกษา วางระบบ และจัดอบรมยกระดับมาตรฐาน Food Safety ครบวงจร",
-          "รับจ้างทำอาหารทดแทนพนักงานในครัว",
-          "จำหน่ายวัตถุดิบอาหารสดเท่านั้น",
-          "จัดหาแม่บ้านทำความสะอาดภายนอกอาคาร"
+          "ผู้ให้บริการที่ปรึกษา วางระบบสุขอนามัย ตรวจประเมิน และจัดอบรมอย่างครบวงจร",
+          "บริการรับส่งเดลิเวอรี่อาหารทั่วไป",
+          "ตัวแทนจำหน่ายอุปกรณ์ตกแต่งห้องอาหาร",
+          "หน่วยงานบังคับคดีและปรับเงินสถานประกอบการ"
         ],
         answer: 0
       },
       {
         part: 2,
-        partName: "ส่วนที่ 2: โซลูชัน AD9 by Dansai Group",
-        category: "การพัฒนาบุคลากร (Food Handler Training)",
-        question: "การอบรมผู้ประกอบกิจการและผู้สัมผัสอาหารผ่านหลักสูตรของ AD9 Solutions ส่งผลดีอย่างไรต่อธุรกิจ?",
+        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
+        category: "การอบรมบุคลากร (Food Handler Training)",
+        question: "8. หลักสูตรการอบรมผู้ประกอบกิจการและผู้สัมผัสอาหารของ AD9 Solutions ส่งผลดีอย่างไร?",
         choices: [
-          "ช่วยให้บุคลากรปฏิบัติงานได้ถูกต้องตามหลักสุขอนามัย ลดความเสี่ยงอาหารเป็นพิษ",
-          "เพิ่มต้นทุนโดยไม่เกิดประโยชน์ในการตรวจสอบ",
-          "ทำให้พนักงานไม่ต้องสวมใส่อุปกรณ์ป้องกันในครัว",
-          "ช่วยให้ข้ามขั้นตอนการตรวจรับรองมาตรฐานได้"
+          "ช่วยให้ทีมงานเข้าใจแนวปฏิบัติที่ถูกต้องตามกฎหมายและลดความเสี่ยงอาหารเป็นพิษ",
+          "เพิ่มภาระงานเอกสารโดยไม่เกิดประโยชน์ต่อคุณภาพอาหาร",
+          "เป็นเพียงการรับใบประกาศโดยไม่ต้องปรับเปลี่ยนพฤติกรรมในครัว",
+          "ทดแทนการล้างมือก่อนปรุงอาหาร"
+        ],
+        answer: 0
+      },
+      {
+        part: 2,
+        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
+        category: "การตรวจสอบและการบันทึกข้อมูล (Audit & Data Tracking)",
+        question: "9. การนำระบบและเครื่องมือของ AD9 มาช่วยในการ Audit มีจุดเด่นสำคัญอย่างไร?",
+        choices: [
+          "การบันทึกข้อมูลตรวจสอบที่เป็นระบบ มีหลักฐาน Audit Trail ที่แม่นยำและตรวจสอบย้อนกลับได้",
+          "อาศัยเพียงความจำของพนักงานโดยไม่ต้องมีบันทึก",
+          "ใช้เอกสารกระดาษจำนวนมากเพื่อเพิ่มความยุ่งยาก",
+          "ตรวจสอบเพียงปีละหนึ่งครั้งก็เพียงพอ"
+        ],
+        answer: 0
+      },
+      {
+        part: 2,
+        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
+        category: "การยกระดับสู่มาตรฐาน SAN / SAN Plus",
+        question: "10. โซลูชัน AD9 มีส่วนช่วยในการเตรียมความพร้อมสู่มาตรฐานระดับ SAN และ SAN Plus อย่างไร?",
+        choices: [
+          "ช่วยตรวจประเมิน Gap Analysis และวางระบบแก้ไขจุดบกพร่องตามเกณฑ์มาตรฐาน",
+          "ช่วยละเว้นการตรวจสอบจากเจ้าหน้าที่สาธารณสุข",
+          "ช่วยลดค่าใช้จ่ายโดยการลดเกณฑ์ความสะอาดลง",
+          "ใช้แทนการควบคุมอุณหภูมิตู้เย็น"
+        ],
+        answer: 0
+      },
+      {
+        part: 2,
+        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
+        category: "วัฒนธรรมความปลอดภัยที่ยั่งยืน (Food Safety Culture)",
+        question: "11. เป้าหมายสูงสุดในการนำโซลูชันของ AD9 และ Dansai Group มาปรับใช้ในองค์กรคืออะไร?",
+        choices: [
+          "การสร้าง Food Safety Culture ที่พนักงานทุกคนมีส่วนร่วมและส่งมอบอาหารที่ปลอดภัยแก่ผู้บริโภค",
+          "การผ่านการตรวจเฉพาะหน้าในวันที่มีการตรวจประเมิน",
+          "การลดจำนวนพนักงานในครัวลงให้เหลือน้อยที่สุด",
+          "การเปลี่ยนวัตถุดิบทั้งหมดให้เป็นอาหารสำเร็จรูป"
         ],
         answer: 0
       }
@@ -224,36 +319,55 @@
 
       const totalScore = scorePart1 + scorePart2;
       document.getElementById("final-score").textContent = `${totalScore} / ${quizData.length}`;
-      document.getElementById("score-part1").textContent = `${scorePart1} / 2`;
-      document.getElementById("score-part2").textContent = `${scorePart2} / 2`;
+      document.getElementById("score-part1").textContent = `${scorePart1} / 6`;
+      document.getElementById("score-part2").textContent = `${scorePart2} / 5`;
 
-      // คำอธิบาย ส่วนที่ 1: Food Safety
-      const evalPart1 = document.getElementById("eval-part1");
-      if (scorePart1 === 2) {
-        evalPart1.textContent = "คุณเป็นคนที่มีความรู้ความเข้าใจพื้นฐานของ Food Safety ได้ดีเยี่ยม มีทักษะการระวังจุดอันตรายและสุขอนามัยในครัวอย่างถูกต้อง";
-      } else if (scorePart1 === 1) {
-        evalPart1.textContent = "คุณเป็นคนที่มีความเข้าใจพื้นฐานของ Food Safety ได้ค่อนข้างดี การทบทวนจุดวิกฤตเรื่องอุณหภูมิและการปนเปื้อนข้ามจะช่วยเสริมความปลอดภัยให้สมบูรณ์";
+      const overallFeedback = document.getElementById("overall-feedback");
+      const resultIcon = document.getElementById("result-icon");
+      const percentage = (totalScore / quizData.length) * 100;
+
+      if (percentage >= 80) {
+        resultIcon.textContent = "🏆";
+        overallFeedback.textContent = "ระดับความเข้าใจ: ยอดเยี่ยม (Ready for Excellence)";
+        overallFeedback.className = "text-xs font-semibold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg inline-block";
+      } else if (percentage >= 50) {
+        resultIcon.textContent = "👍";
+        overallFeedback.textContent = "ระดับความเข้าใจ: ค่อนข้างดี (Good Foundation)";
+        overallFeedback.className = "text-xs font-semibold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-lg inline-block";
       } else {
-        evalPart1.textContent = "ควรศึกษาเพิ่มเติมในหมวดการคุมอุณหภูมิและการแยกอุปกรณ์เตรียมอาหาร เพื่อป้องกันอันตรายจากการปนเปื้อนสู่ผู้บริโภค";
+        resultIcon.textContent = "💡";
+        overallFeedback.textContent = "ระดับความเข้าใจ: ควรพัฒนาเพิ่มเติม (Room for Improvement)";
+        overallFeedback.className = "text-xs font-semibold px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg inline-block";
       }
 
-      // คำอธิบาย ส่วนที่ 2: AD9 Solutions
-      const evalPart2 = document.getElementById("eval-part2");
-      if (scorePart2 === 2) {
-        evalPart2.textContent = "คุณเข้าใจแนวทางของ AD9 Solutions เป็นอย่างดี ว่าการวางระบบ การตรวจสอบ และการอบรมบุคลากร คือหัวใจสำคัญในการยกระดับมาตรฐานอาหารอย่างยั่งยืน";
-      } else if (scorePart2 === 1) {
-        evalPart2.textContent = "คุณเริ่มเห็นภาพความสำคัญของโซลูชันการจัดการสุขอนามัย โดย AD9 Solutions สามารถช่วยเติมเต็มในส่วนของการเทรนนิ่งและการวางระบบตรวจสอบมาตรฐาน";
+      // ประเมินส่วนที่ 1: Food Safety Essentials (6 ข้อ)
+      const evalPart1 = document.getElementById("eval-part1");
+      if (scorePart1 >= 5) {
+        evalPart1.textContent = "คุณเป็นคนที่มีความรู้ความเข้าใจพื้นฐานของ Food Safety ได้ดีเยี่ยม มีทักษะและความแม่นยำในการคุมจุดอันตราย อุณหภูมิ และสุขอนามัยในครัวอย่างเป็นระบบ";
+      } else if (scorePart1 >= 3) {
+        evalPart1.textContent = "คุณเป็นคนที่มีความเข้าใจพื้นฐานของ Food Safety ได้ค่อนข้างดี เข้าใจหลักการหลักได้ถูกต้อง หากทบทวนเรื่องจุดคุมอุณหภูมิและการจัดเก็บเชิงลึกจะช่วยป้องกันความเสี่ยงได้สมบูรณ์ยิ่งขึ้น";
       } else {
-        evalPart2.textContent = "AD9 Solutions ภายใต้ Dansai Group พร้อมเป็นที่ปรึกษาและจัดอบรมเพื่อช่วยให้สถานประกอบการปฏิบัติตามมาตรฐานได้อย่างถูกต้องและราบรื่น";
+        evalPart1.textContent = "ควรศึกษาและทบทวนเพิ่มเติมในเรื่องช่วง Danger Zone, การแยกอุปกรณ์เพื่อป้องกันการปนเปื้อนข้าม และการหมุนเวียนสินค้า เพื่อให้มั่นใจในมาตรฐานความปลอดภัยขั้นพื้นฐาน";
+      }
+
+      // ประเมินส่วนที่ 2: AD9 Solutions & Management (5 ข้อ)
+      const evalPart2 = document.getElementById("eval-part2");
+      if (scorePart2 >= 4) {
+        evalPart2.textContent = "คุณเข้าใจแนวทางและบทบาทของ AD9 Solutions ได้เป็นอย่างดี ว่าการวางระบบ การตรวจสอบ และการฝึกอบรมบุคลากร คือกุญแจสำคัญในการยกระดับองค์กรสู่มาตรฐานสากลและเกณฑ์ SAN / SAN Plus";
+      } else if (scorePart2 >= 2) {
+        evalPart2.textContent = "คุณเริ่มเห็นภาพความสำคัญของการนำระบบ AD9 Solutions เข้ามาช่วยตรวจประเมินและพัฒนาบุคลากร โดยการเชื่อมต่อ Audit Trail จะช่วยลดภาระงานและเพิ่มความน่าเชื่อถือได้ชัดเจน";
+      } else {
+        evalPart2.textContent = "AD9 Solutions ภายใต้ Dansai Group พร้อมเป็นที่ปรึกษา ช่วยตรวจประเมิน และอบรมบุคลากรในครัว เพื่อช่วยให้สถานประกอบการยกระดับมาตรฐานได้อย่างถูกต้องและราบรื่น";
       }
     }
 
     async function sendSummaryToChat() {
       const totalScore = scorePart1 + scorePart2;
-      const summaryMsg = `🎯 ผลการทดสอบ Food Safety & AD9 Solutions\n` +
-                         `คะแนนรวม: ${totalScore}/${quizData.length}\n` +
-                         `• ส่วนที่ 1 (พื้นฐาน Food Safety): ${scorePart1}/2\n` +
-                         `• ส่วนที่ 2 (โซลูชัน AD9): ${scorePart2}/2\n\n` +
+      const summaryMsg = `🎯 ผลการประเมิน Food Safety & AD9 Solutions\n` +
+                         `คะแนนรวม: ${totalScore}/${quizData.length} คะแนน\n` +
+                         `• ส่วนที่ 1 (พื้นฐาน Food Safety): ${scorePart1}/6\n` +
+                         `• ส่วนที่ 2 (โซลูชัน AD9): ${scorePart2}/5\n\n` +
+                         `คุณมีความเข้าใจในมาตรฐานสุขอนามัยอาหารและโซลูชันการจัดการ\n` +
                          `หากต้องการการบริการ คำแนะนำเพิ่มเติมเกี่ยวกับ Food Safety สามารถติดต่อ Dansai Group ได้ที่ Dansai.co.th`;
 
       if (liff.isInClient()) {
