@@ -3,243 +3,445 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Safety & AD9 Solutions Interactive Quiz</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- LINE LIFF SDK v2 -->
-  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <title>Food Safety & AD9 Solutions Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --correct-bg: #dcfce7;
+      --correct-border: #22c55e;
+      --correct-text: #15803d;
+      --incorrect-bg: #fee2e2;
+      --incorrect-border: #ef4444;
+      --incorrect-text: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', sans-serif;
+      -webkit-tap-highlight-color: transparent; /* Prevents mobile tap highlight ghosting */
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .quiz-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 680px;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background-color: #e0f2fe;
+      color: #0369a1;
+      letter-spacing: 0.3px;
+    }
+
+    .badge.part2 {
+      background-color: #fef3c7;
+      color: #b45309;
+    }
+
+    .progress-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background-color: #e2e8f0;
+      border-radius: 9999px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .question-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      color: var(--text-main);
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      text-align: left;
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      font-size: 1rem;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      line-height: 1.4;
+      outline: none;
+    }
+
+    /* Only apply hover on devices that truly support hover (prevents sticky hover on touch) */
+    @media (hover: hover) and (pointer: fine) {
+      .option-btn:hover:not(:disabled) {
+        border-color: var(--primary);
+        background-color: #f0f9ff;
+      }
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+      color: var(--correct-text) !important;
+      font-weight: 600;
+    }
+
+    .option-btn.wrong {
+      background-color: var(--incorrect-bg) !important;
+      border-color: var(--incorrect-border) !important;
+      color: var(--incorrect-text) !important;
+    }
+
+    .explanation-box {
+      display: none;
+      padding: 16px;
+      border-radius: 10px;
+      background-color: #f8fafc;
+      border-left: 4px solid var(--primary);
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #334155;
+    }
+
+    .btn-next {
+      display: none;
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      outline: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-next:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* Result View */
+    .result-container {
+      display: none;
+      text-align: center;
+    }
+
+    .result-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .score-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 28px 0;
+      text-align: left;
+    }
+
+    .score-card {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .score-card h3 {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .score-card .score {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .total-score {
+      margin-bottom: 24px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .btn-restart {
+      padding: 12px 28px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-restart:hover {
+      background-color: var(--primary-hover);
+    }
+
+    @media (max-width: 540px) {
+      .score-summary-grid {
+        grid-template-columns: 1fr;
+      }
+      .quiz-card {
+        padding: 24px;
+      }
+    }
+  </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-3 sm:p-4 font-sans text-slate-800">
+<body>
 
-  <main class="w-full max-w-md bg-white rounded-3xl shadow-sm p-6 flex flex-col justify-between min-h-[580px]">
-    
-    <!-- User Profile Header -->
-    <header class="flex items-center justify-between border-b border-slate-100 pb-3">
-      <div class="flex items-center gap-3">
-        <img id="user-avatar" class="w-10 h-10 rounded-full bg-slate-200 hidden object-cover border border-slate-200" alt="Avatar">
-        <div>
-          <p class="text-[11px] text-slate-400 font-medium">ผู้เข้าทำแบบทดสอบ</p>
-          <p id="user-name" class="font-semibold text-sm text-slate-800">กำลังโหลดข้อมูล...</p>
+  <div class="quiz-card">
+    <!-- Active Quiz View -->
+    <div id="quiz-view">
+      <div class="header">
+        <span id="part-badge" class="badge">ส่วนที่ 1: Basic Food Hygiene</span>
+        <span id="progress-indicator" class="progress-text">ข้อ 1/11</span>
+      </div>
+      <div class="progress-bar-container">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+
+      <h2 id="question-text" class="question-title"></h2>
+      <div id="options-container" class="options-grid"></div>
+
+      <div id="explanation-container" class="explanation-box"></div>
+      <button id="next-btn" class="btn-next">ข้อถัดไป</button>
+    </div>
+
+    <!-- Final Result View -->
+    <div id="result-view" class="result-container">
+      <h2 class="result-title">สรุปผลการประเมิน</h2>
+      <p class="total-score" id="total-score-text"></p>
+
+      <div class="score-summary-grid">
+        <div class="score-card">
+          <h3>ส่วนที่ 1: Basic Food Hygiene</h3>
+          <div class="score" id="part1-score-text">0 / 6</div>
+          <p id="part1-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;"></p>
         </div>
-      </div>
-      <div class="text-right">
-        <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500">Interactive Quiz</span>
-      </div>
-    </header>
-
-    <!-- Quiz Question Section -->
-    <section id="quiz-area" class="my-auto py-3">
-      <!-- Section Tag & Progress -->
-      <div class="flex justify-between items-center text-xs mb-2">
-        <span id="section-badge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
-          ส่วนที่ 1: พื้นฐาน Food Safety
-        </span>
-        <span id="question-progress" class="font-medium text-slate-500">1 / 11</span>
-      </div>
-
-      <div id="category-badge" class="inline-block text-[11px] font-medium text-slate-500 mb-2">
-        หมวดหมู่
-      </div>
-      <h2 id="question-text" class="text-base sm:text-lg font-bold text-slate-900 mb-4 leading-snug">กำลังโหลดคำถาม...</h2>
-      <div id="choices-container" class="space-y-2.5"></div>
-    </section>
-
-    <!-- Quiz Result & Deep Evaluation Section -->
-    <section id="result-area" class="hidden my-auto py-2">
-      <!-- Summary Header -->
-      <div class="text-center mb-3">
-        <div id="result-icon" class="text-4xl mb-1">📋</div>
-        <h2 class="text-xl font-bold text-slate-900">สรุปผลการประเมิน</h2>
-        <div id="final-score" class="text-3xl font-extrabold text-emerald-600 my-1">0 / 11</div>
-        <p id="overall-feedback" class="text-xs text-slate-600 font-medium px-2 py-1.5 bg-slate-100 rounded-lg inline-block">
-          กำลังคำนวณผล...
-        </p>
-      </div>
-
-      <!-- Evaluation Breakdown (Part 1 & Part 2) -->
-      <div class="space-y-2.5 mb-4 text-left">
-        <!-- Part 1 Review Box -->
-        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-slate-700">ส่วนที่ 1: พื้นฐาน Food Safety (6 ข้อ)</span>
-            <span id="score-part1" class="text-xs font-semibold text-emerald-600">0/6</span>
-          </div>
-          <p id="eval-part1" class="text-xs text-slate-600 leading-relaxed font-normal">
-            กำลังประเมิน...
-          </p>
-        </div>
-
-        <!-- Part 2 Review Box (AD9 Solutions) -->
-        <div class="p-3 bg-indigo-50/70 rounded-2xl border border-indigo-100">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-indigo-900">ส่วนที่ 2: โซลูชันและการจัดการ AD9 (5 ข้อ)</span>
-            <span id="score-part2" class="text-xs font-semibold text-indigo-600">0/5</span>
-          </div>
-          <p id="eval-part2" class="text-xs text-indigo-950 leading-relaxed font-normal">
-            กำลังประเมิน...
-          </p>
+        <div class="score-card">
+          <h3>ส่วนที่ 2: AD9 Solutions</h3>
+          <div class="score" id="part2-score-text">0 / 5</div>
+          <p id="part2-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;"></p>
         </div>
       </div>
 
-      <!-- Dansai Group CTA Section -->
-      <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 text-center mb-4">
-        <p class="text-xs text-slate-600 leading-relaxed mb-2.5">
-          หากต้องการการบริการ คำแนะนำเพิ่มเติมเกี่ยวกับ Food Safety และโซลูชัน <span class="font-bold text-indigo-900">AD9 Solutions</span> สามารถติดต่อ <span class="font-bold text-slate-800">Dansai Group</span> ได้ที่
-        </p>
-        <a href="https://www.dansai.co.th/?page_id=249" target="_blank" class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-100/70 hover:bg-indigo-200/70 px-4 py-2 rounded-xl transition duration-150 shadow-sm">
-          🌐 ศึกษาข้อมูล AD9 Solutions ที่ Dansai.co.th
-        </a>
-      </div>
-
-      <!-- Action Button -->
-      <button onclick="sendSummaryToChat()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-sm transition text-sm">
-        แชร์สรุปผลเข้าห้องแชต & ปิดหน้าต่าง
-      </button>
-    </section>
-
-  </main>
+      <button id="restart-btn" class="btn-restart">ทำแบบทดสอบอีกครั้ง</button>
+    </div>
+  </div>
 
   <script>
-    // ** แทนที่ด้วย LIFF ID ของคุณที่สร้างไว้ **
-    const MY_LIFF_ID = "2011998700-oIjeMpys";
+    const questions = [
+      // Part 1: Basic Food Hygiene
+      {
+        part: 1,
+        partLabel: "ส่วนที่ 1: Basic Food Hygiene",
+        question: "ช่วงอุณหภูมิใดถือเป็นโซนอันตราย (Temperature Danger Zone: TDZ) ที่แบคทีเรียส่วนใหญ่เจริญเติบโตและแบ่งตัวได้อย่างรวดเร็วที่สุด?",
+        options: [
+          "ช่วงอุณหภูมิ -18°C ถึง 0°C",
+          "ช่วงอุณหภูมิ 5°C ถึง 60°C",
+          "ช่วงอุณหภูมิ 65°C ถึง 80°C",
+          "ช่วงอุณหภูมิ 100°C ขึ้นไป"
+        ],
+        correct: 1,
+        explanation: "ช่วง 5°C - 60°C คือโซนอันตราย (TDZ) เนื่องจากแบคทีเรียสามารถเพิ่มจำนวนได้เป็นสองเท่าในทุกๆ 20 นาที จึงต้องควบคุมอาหารให้อยู่ต่ำกว่า 5°C หรือร้อนกว่า 60°C"
+      },
+      {
+        part: 1,
+        partLabel: "ส่วนที่ 1: Basic Food Hygiene",
+        question: "ตามหลักมาตรฐานสากลด้านการแยกสีเขียงเพื่อป้องกันการปนเปื้อนข้าม (Cross-contamination) เขียง 'สีแดง' และ 'สีเขียว' ถูกกำหนดให้ใช้กับวัตถุดิบประเภทใดตามลำดับ?",
+        options: [
+          "เนื้อสัตว์ดิบ และ ผักสดผลไม้",
+          "อาหารทะเลดิบ และ สัตว์ปีกดิบ",
+          "อาหารปรุงสุก และ ผลิตภัณฑ์นมเนย",
+          "เนื้อสัตว์ดิบ และ เบเกอรี่/ขนมปัง"
+        ],
+        correct: 0,
+        explanation: "มาตรฐานสากลกำหนดให้เขียงสีแดงใช้สำหรับเนื้อสัตว์ดิบ (Raw Meat) และสีเขียวสำหรับผักผลไม้สด (Salad/Fruit) เพื่อป้องกันแบคทีเรียจากเนื้อดิบถ่ายโอนไปยังผักที่ทานสด"
+      },
+      {
+        part: 1,
+        partLabel: "ส่วนที่ 1: Basic Food Hygiene",
+        question: "เชื้อแบคทีเรียชนิดใดที่พบบ่อยมากในเนื้อไก่ดิบและเปลือกไข่ดิบ ซึ่งเป็นสาเหตุหลักที่ทำให้เกิดอาการท้องเสียรุนแรง ไข้ขึ้น และปวดท้องเฉียบพลัน?",
+        options: [
+          "เชื้อราบนขนมปัง (Mold)",
+          "ยีสต์หมักอาหาร (Yeast)",
+          "เชื้อซัลโมเนลลา (Salmonella)",
+          "แบคทีเรียโพรไบโอติกส์ (Probiotics)"
+        ],
+        correct: 2,
+        explanation: "ซัลโมเนลลา (Salmonella) มักแฝงอยู่ในลำไส้สัตว์ปีก เนื้อไก่ดิบ และเปลือกไข่ดิบ เป็นเชื้อสำคัญที่ก่อให้เกิดภาวะอาหารเป็นพิษเฉียบพลัน"
+      },
+      {
+        part: 1,
+        partLabel: "ส่วนที่ 1: Basic Food Hygiene",
+        question: "การจัดเก็บอาหารในตู้เย็นตามหลักสุขาภิบาลที่ถูกต้องเพื่อป้องกันปนเปื้อนข้าม ควรวาง 'เนื้อสัตว์ดิบ' ไว้ที่ตำแหน่งใด?",
+        options: [
+          "ชั้นบนสุดติดช่องแช่แข็ง",
+          "วางรวมกับอาหารปรุงสุกพร้อมทาน",
+          "ชั้นวางล่างสุดในภาชนะปิดมิดชิด",
+          "ประตูตู้เย็นด้านข้าง"
+        ],
+        correct: 2,
+        explanation: "เนื้อสัตว์ดิบต้องแช่ไว้ที่ชั้นล่างสุดและปิดฝามิดชิดเสมอ เพื่อป้องกันไม่ให้น้ำเลือดหรือของเหลวจากเนื้อดิบหยดลงมาปนเปื้อนอาหารปรุงสุกหรือผักด้านล่าง"
+      },
+      {
+        part: 1,
+        partLabel: "ส่วนที่ 1: Basic Food Hygiene",
+        question: "ตามกฎความปลอดภัยอาหารสากล 'กฎ 2 ชั่วโมง / 4 ชั่วโมง' กำหนดแนวทางการปฏิบัติกับอาหารปรุงสุกที่วางอยู่ในโซนอันตรายไว้อย่างไร?",
+        options: [
+          "วางได้สูงสุด 24 ชั่วโมงหากมีฝาครอบ",
+          "ต้องทิ้งทันทีหากวางไว้นานเกิน 4 ชั่วโมง",
+          "นำไปแช่เย็นได้ตลอดเวลาไม่ว่าจะวางไว้นานเท่าใด",
+          "อุ่นซ้ำได้เรื่อยๆ โดยไม่ต้องคำนึงถึงเวลาสะสม"
+        ],
+        correct: 1,
+        explanation: "หากอาหารปรุงสุกอยู่ในโซนอันตรายสะสมเกิน 4 ชั่วโมง เชื้ออาจสร้างสารพิษที่ไม่สลายตัวด้วยความร้อน จึงต้องทิ้งทันที ห้ามนำกลับมาเสิร์ฟหรือแช่เย็นใหม่"
+      },
+      {
+        part: 1,
+        partLabel: "ส่วนที่ 1: Basic Food Hygiene",
+        question: "พฤติกรรมใดในการล้างมือของผู้ปฏิบัติงานในครัวถือว่าถูกต้องตามมาตรฐานสุขาภิบาลอาหารมากที่สุด?",
+        options: [
+          "ล้างด้วยน้ำเปล่าอย่างรวดเร็ว 5 วินาที",
+          "ใช้แอลกอฮอล์เจลแทนการล้างมือแม้มีคราบไขมันติดมือ",
+          "ถูสบู่ให้ทั่วทุกจุดอย่างน้อย 20 วินาทีก่อนล้างออก",
+          "เช็ดมือด้วยผ้ากันเปื้อนที่ใส่ทำงานอยู่"
+        ],
+        correct: 2,
+        explanation: "การล้างมือที่ถูกต้องต้องฟอกสบู่ให้ทั่วฝ่ามือ ซอกนิ้ว ข้อมือ และใต้เล็บเป็นเวลาอย่างน้อย 20 วินาที แล้วเช็ดให้แห้งด้วยกระดาษชำระแบบใช้ครั้งเดียวทิ้ง"
+      },
 
-    // ชุดคำถาม 11 ข้อ (ส่วนที่ 1 = 6 ข้อ, ส่วนที่ 2 = 5 ข้อ)
-    const quizData = [
-      // ==================== ส่วนที่ 1: พื้นฐาน Food Safety (6 ข้อ) ====================
-      {
-        part: 1,
-        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
-        category: "การควบคุมอุณหภูมิ (Temperature Danger Zone)",
-        question: "1. ช่วงอุณหภูมิ Temperature Danger Zone ที่เชื้อจุลินทรีย์แบ่งตัวได้รวดเร็วที่สุดคือช่วงใด?",
-        choices: ["-18°C ถึง 0°C", "5°C ถึง 60°C", "65°C ถึง 100°C", "100°C ขึ้นไป"],
-        answer: 1
-      },
-      {
-        part: 1,
-        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
-        category: "การป้องกันการปนเปื้อนข้าม (Cross-Contamination)",
-        question: "2. การจัดเก็บอาหารในตู้เย็นตามหลักสุขอนามัย ควรวางอาหารประเภทใดไว้ชั้นล่างสุดเสมอ?",
-        choices: [
-          "อาหารพร้อมรับประทาน (Ready-to-eat)",
-          "เบเกอรี่และของหวาน (Bakery & Pastry)",
-          "เนื้อสัตว์และสัตว์ปีกดิบ (Raw Poultry/Meat)",
-          "ผักและผลไม้ที่ล้างแล้ว (Fresh Fruit & Vegetables)"
-        ],
-        answer: 2
-      },
-      {
-        part: 1,
-        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
-        category: "สุขอนามัยส่วนบุคคล (Personal Hygiene)",
-        question: "3. ขั้นตอนการล้างมือที่ได้มาตรฐานของพนักงานสัมผัสอาหาร ควรใช้เวลาถูสบู่อย่างน้อยกี่วินาที?",
-        choices: ["5 วินาที", "10 วินาที", "20 วินาที", "60 วินาที"],
-        answer: 2
-      },
-      {
-        part: 1,
-        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
-        category: "การจัดเก็บและหมุนเวียนสินค้า (Stock Rotation)",
-        question: "4. หลักการ 'FIFO' (First-In, First-Out) มีเป้าหมายสำคัญที่สุดในการจัดการวัตถุดิบอย่างไร?",
-        choices: [
-          "ใช้วัตถุดิบที่รับเข้ามาก่อนหรือมีอายุคงเหลือน้อยกว่าก่อน เพื่อลดของหมดอายุ",
-          "จัดวางของที่มีน้ำหนักมากไว้ข้างหน้าเสมอ",
-          "ใช้วัตถุดิบใหม่ล่าสุดก่อนเพื่อให้ได้ความสด",
-          "เน้นประหยัดพื้นที่จัดเก็บโดยไม่คำนึงถึงวันหมดอายุ"
-        ],
-        answer: 0
-      },
-      {
-        part: 1,
-        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
-        category: "การทำละลายอาหารแช่แข็ง (Thawing Methods)",
-        question: "5. วิธีการทำละลายอาหารแช่แข็ง (Thawing) ข้อใดถือว่าปลอดภัยและถูกต้องตามมาตรฐาน?",
-        choices: [
-          "แช่ทิ้งไว้ในอ่างน้ำอุ่นที่อุณหภูมิห้องข้ามคืน",
-          "วางทิ้งไว้บนเคาน์เตอร์ในครัวที่อุณหภูมิห้อง",
-          "ย้ายลงมาทำละลายในตู้แช่เย็น (Chiller) ที่อุณหภูมิต่ำกว่า 4°C ล่วงหน้า",
-          "นำไปตากแดดเพื่อให้ละลายเร็วขึ้น"
-        ],
-        answer: 2
-      },
-      {
-        part: 1,
-        partName: "ส่วนที่ 1: พื้นฐาน Food Safety",
-        category: "การควบคุมสารก่อภูมิแพ้ (Allergen Control)",
-        question: "6. เมื่อลูกค้าแจ้งว่าแพ้อาหารเฉพาะกลุ่ม ข้อปฏิบัติใดที่ครัวต้องระมัดระวังสูงสุด?",
-        choices: [
-          "ใช้น้ำมันกระทะเดิมทอดเพื่อความหอม",
-          "แยกอุปกรณ์ กระทะ และภาชนะเฉพาะเพื่อป้องกันการปนเปื้อนข้ามของสารก่อภูมิแพ้",
-          "ตักส่วนผสมที่แพ้ออกด้วยช้อนก่อนเสิร์ฟ",
-          "ปรุงอาหารตามปกติเพราะความร้อนสูงสามารถทำลายสารก่อภูมิแพ้ได้"
-        ],
-        answer: 1
-      },
-
-      // ==================== ส่วนที่ 2: โซลูชันและการจัดการ AD9 (5 ข้อ) ====================
+      // Part 2: AD9 Solutions
       {
         part: 2,
-        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
-        category: "บทบาทของ AD9 Solutions (Overview & Role)",
-        question: "7. บทบาทหลักของ AD9 Solutions ภายใต้ Dansai Group ในธุรกิจอาหารและการบริการคือข้อใด?",
-        choices: [
-          "ผู้ให้บริการที่ปรึกษา วางระบบสุขอนามัย ตรวจประเมิน และจัดอบรมอย่างครบวงจร",
-          "บริการรับส่งเดลิเวอรี่อาหารทั่วไป",
-          "ตัวแทนจำหน่ายอุปกรณ์ตกแต่งห้องอาหาร",
-          "หน่วยงานบังคับคดีและปรับเงินสถานประกอบการ"
+        partLabel: "ส่วนที่ 2: AD9 Solutions",
+        question: "ในแง่ของการบริหารความเสี่ยงด้านสุขอนามัยอาหาร (Food Safety Risk Management) ประโยชน์เชิงปฏิบัติที่สำคัญที่สุดของ AD9 Solutions คือข้อใด?",
+        options: [
+          "การยกเลิกกระบวนการล้างทำความสะอาดในสถานประกอบการ",
+          "การตรวจจับการปนเปื้อนข้ามและเชื้อจุลินทรีย์ที่มองไม่เห็นเพื่อสกัดความเสี่ยงล่วงหน้า",
+          "การควบคุมต้นทุนวัตถุดิบอาหารให้ได้ราคาต่ำที่สุดในตลาด",
+          "การเพิ่มอายุการเก็บรักษาอาหารโดยใช้สารเคมีสังเคราะห์"
         ],
-        answer: 0
+        correct: 1,
+        explanation: "AD9 Solutions เน้นการตรวจวัดเชื้อและสิ่งปนเปื้อนที่มองไม่เห็นด้วยตาเปล่าและทนทานต่อน้ำยา เพื่อตัดวงจรการปนเปื้อนข้ามก่อนลุกลามเป็นปัญหาใหญ่"
       },
       {
         part: 2,
-        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
-        category: "การอบรมบุคลากร (Food Handler Training)",
-        question: "8. หลักสูตรการอบรมผู้ประกอบกิจการและผู้สัมผัสอาหารของ AD9 Solutions ส่งผลดีอย่างไร?",
-        choices: [
-          "ช่วยให้ทีมงานเข้าใจแนวปฏิบัติที่ถูกต้องตามกฎหมายและลดความเสี่ยงอาหารเป็นพิษ",
-          "เพิ่มภาระงานเอกสารโดยไม่เกิดประโยชน์ต่อคุณภาพอาหาร",
-          "เป็นเพียงการรับใบประกาศโดยไม่ต้องปรับเปลี่ยนพฤติกรรมในครัว",
-          "ทดแทนการล้างมือก่อนปรุงอาหาร"
+        partLabel: "ส่วนที่ 2: AD9 Solutions",
+        question: "AD9 Solutions ช่วยส่งเสริมการขอรับรองมาตรฐานด้านสุขาภิบาลอาหาร เช่น เกณฑ์มาตรฐาน SAN และ SAN+ อย่างไร?",
+        options: [
+          "การรวบรวมหลักฐานและบันทึกผลการตรวจสอบอย่างเป็นระบบเพื่อรองรับการตรวจประเมิน",
+          "การออกใบรับรองมาตรฐานความปลอดภัยอาหารระดับสากลให้สถานประกอบการได้ทันที",
+          "การอนุญาตให้ลดขั้นตอนปฏิบัติตามกฎหมายสุขาภิบาลอาหาร",
+          "การรับประกันว่าจะไม่มีการเข้าตรวจประเมินจากหน่วยงานราชการ"
         ],
-        answer: 0
+        correct: 0,
+        explanation: "AD9 มีบทบาทในการเก็บรวบรวมข้อมูล หลักฐาน และบันทึกผลตรวจทางสุขอนามัยอย่างเป็นระบบ ช่วยให้เตรียมความพร้อมรับการตรวจสอบ (Audit) ตามเกณฑ์ SAN/SAN+ ได้ง่ายขึ้น"
       },
       {
         part: 2,
-        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
-        category: "การตรวจสอบและการบันทึกข้อมูล (Audit & Data Tracking)",
-        question: "9. การนำระบบและเครื่องมือของ AD9 มาช่วยในการ Audit มีจุดเด่นสำคัญอย่างไร?",
-        choices: [
-          "การบันทึกข้อมูลตรวจสอบที่เป็นระบบ มีหลักฐาน Audit Trail ที่แม่นยำและตรวจสอบย้อนกลับได้",
-          "อาศัยเพียงความจำของพนักงานโดยไม่ต้องมีบันทึก",
-          "ใช้เอกสารกระดาษจำนวนมากเพื่อความสมบูรณ์ของข้อมูล",
-          "ตรวจสอบเพียงปีละหนึ่งครั้งก็เพียงพอ"
+        partLabel: "ส่วนที่ 2: AD9 Solutions",
+        question: "เมื่อเชื่อมโยง AD9 Solutions เข้ากับแพลตฟอร์มจัดการข้อมูล (เช่น แดชบอร์ดหรือ Vservesafe) ประโยชน์ที่ผู้บริหารสถานประกอบการจะได้รับคืออะไร?",
+        options: [
+          "การติดตามสถานะสุขอนามัยแบบเรียลไทม์เพื่อระบุจุดบกพร่องและแก้ไขได้ทันที",
+          "การคำนวณกำไรขาดทุนของเมนูอาหารแต่ละจานแบบอัตโนมัติ",
+          "การสั่งซื้อวัตถุดิบจากซัพพลายเออร์โดยตรงโดยไม่ต้องตรวจสอบ",
+          "การแทนที่บุคลากรในครัวทั้งหมดด้วยระบบอัตโนมัติ"
         ],
-        answer: 0
+        correct: 0,
+        explanation: "การเชื่อมต่อกับระบบแดชบอร์ดช่วยให้ผู้บริหารและผู้ควบคุมงานมองเห็นสถานะความสะอาดและสุขอนามัยแบบเรียลไทม์ จุดไหนบกพร่องก็เข้าไปแก้ไขได้ทันที"
       },
       {
         part: 2,
-        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
-        category: "การยกระดับสู่มาตรฐาน SAN / SAN Plus",
-        question: "10. โซลูชัน AD9 มีส่วนช่วยในการเตรียมความพร้อมสู่มาตรฐานระดับ SAN และ SAN Plus อย่างไร?",
-        choices: [
-          "ช่วยตรวจประเมิน Gap Analysis และวางระบบแก้ไขจุดบกพร่องตามเกณฑ์มาตรฐาน",
-          "ช่วยละเว้นการตรวจสอบจากเจ้าหน้าที่สาธารณสุข",
-          "ช่วยลดค่าใช้จ่ายโดยการลดเกณฑ์ความสะอาดลง",
-          "ใช้แทนการควบคุมอุณหภูมิตู้เย็น"
+        partLabel: "ส่วนที่ 2: AD9 Solutions",
+        question: "ในมุมมองด้านความคุ้มค่าของการดำเนินงาน (Operational Efficiency) การนำ AD9 Solutions มาใช้ช่วยลดต้นทุนแฝงของธุรกิจได้อย่างไร?",
+        options: [
+          "การลดเวลาการตรวจสอบแบบเอกสารกระดาษและป้องกันความสูญเสียจากวิกฤตแบรนด์",
+          "การลดค่าใช้จ่ายด้านสาธารณูปโภค เช่น ค่าน้ำและค่าไฟฟ้าในครัว",
+          "การลดจำนวนพนักงานบริการในห้องอาหาร",
+          "การลดการเปลี่ยนอุปกรณ์ทำครัวทุกสัปดาห์"
         ],
-        answer: 0
+        correct: 0,
+        explanation: "ช่วยลดภาระงานเอกสาร (Paperless Audit) และที่สำคัญคือป้องกันความเสียหายมหาศาลจากการเกิดโรคระบาดทางอาหารหรือวิกฤตศรัทธาของแบรนด์ (Brand Crisis)"
       },
       {
         part: 2,
-        partName: "ส่วนที่ 2: โซลูชันและการจัดการ AD9",
-        category: "วัฒนธรรมความปลอดภัยที่ยั่งยืน (Food Safety Culture)",
-        question: "11. เป้าหมายสูงสุดในการนำโซลูชันของ AD9 และ Dansai Group มาปรับใช้ในองค์กรคืออะไร?",
-        choices: [
-          "การสร้าง Food Safety Culture ที่พนักงานทุกคนมีส่วนร่วมและส่งมอบอาหารที่ปลอดภัยแก่ผู้บริโภค",
-          "การผ่านการตรวจเฉพาะหน้าในวันที่มีการตรวจประเมิน",
-          "การลดจำนวนพนักงานในครัวลงให้เหลือน้อยที่สุด",
-          "การเปลี่ยนวัตถุดิบทั้งหมดให้เป็นอาหารสำเร็จรูป"
+        partLabel: "ส่วนที่ 2: AD9 Solutions",
+        question: "ประโยชน์ที่ส่งผลต่อการสร้างความเชื่อมั่นของผู้บริโภค (Customer Trust) จากการประยุกต์ใช้ AD9 Solutions คือข้อใด?",
+        options: [
+          "การแสดงให้เห็นถึงมาตรฐานความปลอดภัยอาหารที่ตรวจสอบย้อนกลับและยืนยันได้",
+          "การมอบส่วนลดราคาอาหารให้แก่ลูกค้าที่มาใช้บริการ",
+          "การตกแต่งหน้าร้านให้ดูทันสมัยตามกระแสนิยม",
+          "การการันตีรสชาติอาหารที่อร่อยถูกปากผู้บริโภคทุกคน"
         ],
-        answer: 0
+        correct: 0,
+        explanation: "สร้างความมั่นใจสูงสุดให้แก่ลูกค้า เพราะมีระบบและหลักฐานทางสุขอนามัยที่พิสูจน์ ตรวจสอบย้อนกลับ และยืนยันได้จริงตามมาตรฐานสากล"
       }
     ];
 
@@ -247,147 +449,123 @@
     let scorePart1 = 0;
     let scorePart2 = 0;
 
-    async function initializeLiff() {
-      try {
-        await liff.init({ liffId: MY_LIFF_ID });
-        if (!liff.isLoggedIn()) {
-          liff.login();
-          return;
-        }
-        const profile = await liff.getProfile();
-        document.getElementById("user-name").textContent = profile.displayName;
-        if (profile.pictureUrl) {
-          const avatar = document.getElementById("user-avatar");
-          avatar.src = profile.pictureUrl;
-          avatar.classList.remove("hidden");
-        }
-        renderQuestion();
-      } catch (err) {
-        console.warn("LIFF fallback:", err);
-        document.getElementById("user-name").textContent = "ผู้เข้าร่วมทดสอบ";
-        renderQuestion();
-      }
-    }
+    const quizView = document.getElementById("quiz-view");
+    const resultView = document.getElementById("result-view");
+    const partBadge = document.getElementById("part-badge");
+    const progressIndicator = document.getElementById("progress-indicator");
+    const progressBar = document.getElementById("progress-bar");
+    const questionText = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    const explanationContainer = document.getElementById("explanation-container");
+    const nextBtn = document.getElementById("next-btn");
 
-    function renderQuestion() {
-      const q = quizData[currentIndex];
-      
-      const badge = document.getElementById("section-badge");
-      badge.textContent = q.partName;
-      if (q.part === 1) {
-        badge.className = "px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800";
+    function loadQuestion() {
+      // Remove any lingering focus
+      if (document.activeElement && typeof document.activeElement.blur === "function") {
+        document.activeElement.blur();
+      }
+
+      const q = questions[currentIndex];
+
+      // Update badge
+      partBadge.innerText = q.partLabel;
+      if (q.part === 2) {
+        partBadge.classList.add("part2");
       } else {
-        badge.className = "px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-100 text-indigo-800";
+        partBadge.classList.remove("part2");
       }
 
-      document.getElementById("question-progress").textContent = `${currentIndex + 1} / ${quizData.length}`;
-      document.getElementById("category-badge").textContent = `หมวด: ${q.category}`;
-      document.getElementById("question-text").textContent = q.question;
+      progressIndicator.innerText = `ข้อ ${currentIndex + 1}/${questions.length}`;
+      progressBar.style.width = `${((currentIndex) / questions.length) * 100}%`;
 
-      const container = document.getElementById("choices-container");
-      container.innerHTML = "";
+      // Set Question
+      questionText.innerText = q.question;
+      optionsContainer.innerHTML = "";
+      explanationContainer.style.display = "none";
+      nextBtn.style.display = "none";
 
-      q.choices.forEach((choice, idx) => {
+      // Render fresh buttons without cloned states
+      q.options.forEach((opt, idx) => {
         const btn = document.createElement("button");
-        btn.className = "w-full text-left p-3.5 border border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/40 transition font-medium text-xs sm:text-sm";
-        btn.textContent = choice;
-        btn.onclick = () => selectChoice(idx);
-        container.appendChild(btn);
+        btn.type = "button";
+        btn.className = "option-btn";
+        btn.innerText = opt;
+        btn.onclick = () => selectOption(idx);
+        optionsContainer.appendChild(btn);
       });
     }
 
-    function selectChoice(index) {
-      const currentQ = quizData[currentIndex];
-      const isCorrect = (index === currentQ.answer);
+    function selectOption(selectedIndex) {
+      const q = questions[currentIndex];
+      const buttons = optionsContainer.querySelectorAll(".option-btn");
 
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.correct) {
+          btn.classList.add("correct");
+        } else if (idx === selectedIndex) {
+          btn.classList.add("wrong");
+        }
+      });
+
+      // Score evaluation
+      const isCorrect = (selectedIndex === q.correct);
       if (isCorrect) {
-        if (currentQ.part === 1) scorePart1++;
-        if (currentQ.part === 2) scorePart2++;
+        if (q.part === 1) scorePart1++;
+        if (q.part === 2) scorePart2++;
       }
 
+      // Show explanation
+      explanationContainer.innerHTML = `<strong>คำอธิบาย:</strong> ${q.explanation}`;
+      explanationContainer.style.display = "block";
+      nextBtn.style.display = "block";
+
+      // Update progress fill
+      progressBar.style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+    }
+
+    nextBtn.onclick = () => {
+      // Explicitly blur the Next button to clear any sticky state
+      nextBtn.blur();
       currentIndex++;
-      if (currentIndex < quizData.length) {
-        renderQuestion();
+      if (currentIndex < questions.length) {
+        loadQuestion();
       } else {
         showResults();
       }
-    }
+    };
 
     function showResults() {
-      document.getElementById("quiz-area").classList.add("hidden");
-      document.getElementById("result-area").classList.remove("hidden");
+      quizView.style.display = "none";
+      resultView.style.display = "block";
 
       const totalScore = scorePart1 + scorePart2;
-      document.getElementById("final-score").textContent = `${totalScore} / ${quizData.length}`;
-      document.getElementById("score-part1").textContent = `${scorePart1} / 6`;
-      document.getElementById("score-part2").textContent = `${scorePart2} / 5`;
+      const totalQuestions = questions.length;
+      const percentTotal = Math.round((totalScore / totalQuestions) * 100);
 
-      const overallFeedback = document.getElementById("overall-feedback");
-      const resultIcon = document.getElementById("result-icon");
-      const percentage = (totalScore / quizData.length) * 100;
+      document.getElementById("total-score-text").innerText = 
+        `คะแนนรวม: ${totalScore} จาก ${totalQuestions} คะแนน (${percentTotal}%)`;
 
-      if (percentage >= 80) {
-        resultIcon.textContent = "🏆";
-        overallFeedback.textContent = "ระดับความเข้าใจ: ยอดเยี่ยม (Ready for Excellence)";
-        overallFeedback.className = "text-xs font-semibold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg inline-block";
-      } else if (percentage >= 50) {
-        resultIcon.textContent = "👍";
-        overallFeedback.textContent = "ระดับความเข้าใจ: ค่อนข้างดี (Good Foundation)";
-        overallFeedback.className = "text-xs font-semibold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-lg inline-block";
-      } else {
-        resultIcon.textContent = "💡";
-        overallFeedback.textContent = "ระดับความเข้าใจ: ควรพัฒนาเพิ่มเติม (Room for Improvement)";
-        overallFeedback.className = "text-xs font-semibold px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg inline-block";
-      }
+      document.getElementById("part1-score-text").innerText = `${scorePart1} / 6`;
+      document.getElementById("part1-desc").innerText = 
+        `คิดเป็น ${Math.round((scorePart1 / 6) * 100)}% (สุขอนามัยพื้นฐาน)`;
 
-      // ประเมินส่วนที่ 1: Food Safety Essentials (6 ข้อ)
-      const evalPart1 = document.getElementById("eval-part1");
-      if (scorePart1 >= 5) {
-        evalPart1.textContent = "คุณเป็นคนที่มีความรู้ความเข้าใจพื้นฐานของ Food Safety ได้ดีเยี่ยม มีทักษะและความแม่นยำในการคุมจุดอันตราย อุณหภูมิ และสุขอนามัยในครัวอย่างเป็นระบบ";
-      } else if (scorePart1 >= 3) {
-        evalPart1.textContent = "คุณเป็นคนที่มีความเข้าใจพื้นฐานของ Food Safety ได้ค่อนข้างดี เข้าใจหลักการหลักได้ถูกต้อง หากทบทวนเรื่องจุดคุมอุณหภูมิและการจัดเก็บเชิงลึกจะช่วยป้องกันความเสี่ยงได้สมบูรณ์ยิ่งขึ้น";
-      } else {
-        evalPart1.textContent = "ควรศึกษาและทบทวนเพิ่มเติมในเรื่องช่วง Danger Zone, การแยกอุปกรณ์เพื่อป้องกันการปนเปื้อนข้าม และการหมุนเวียนสินค้า เพื่อให้มั่นใจในมาตรฐานความปลอดภัยขั้นพื้นฐาน";
-      }
-
-      // ประเมินส่วนที่ 2: AD9 Solutions & Management (5 ข้อ)
-      const evalPart2 = document.getElementById("eval-part2");
-      if (scorePart2 >= 4) {
-        evalPart2.textContent = "คุณเข้าใจแนวทางและบทบาทของ AD9 Solutions ได้เป็นอย่างดี ว่าการวางระบบ การตรวจสอบ และการฝึกอบรมบุคลากร คือกุญแจสำคัญในการยกระดับองค์กรสู่มาตรฐานสากลและเกณฑ์ SAN / SAN Plus";
-      } else if (scorePart2 >= 2) {
-        evalPart2.textContent = "คุณเริ่มเห็นภาพความสำคัญของการนำระบบ AD9 Solutions เข้ามาช่วยตรวจประเมินและพัฒนาบุคลากร โดยการเชื่อมต่อ Audit Trail จะช่วยลดภาระงานและเพิ่มความน่าเชื่อถือได้ชัดเจน";
-      } else {
-        evalPart2.textContent = "AD9 Solutions ภายใต้ Dansai Group พร้อมเป็นที่ปรึกษา ช่วยตรวจประเมิน และอบรมบุคลากรในครัว เพื่อช่วยให้สถานประกอบการยกระดับมาตรฐานได้อย่างถูกต้องและราบรื่น";
-      }
+      document.getElementById("part2-score-text").innerText = `${scorePart2} / 5`;
+      document.getElementById("part2-desc").innerText = 
+        `คิดเป็น ${Math.round((scorePart2 / 5) * 100)}% (ระบบ AD9 Solutions)`;
     }
 
-    async function sendSummaryToChat() {
-      const totalScore = scorePart1 + scorePart2;
-      const summaryMsg = `🎯 ผลการประเมิน Food Safety & AD9 Solutions\n` +
-                         `คะแนนรวม: ${totalScore}/${quizData.length} คะแนน\n` +
-                         `• ส่วนที่ 1 (พื้นฐาน Food Safety): ${scorePart1}/6\n` +
-                         `• ส่วนที่ 2 (โซลูชัน AD9): ${scorePart2}/5\n\n` +
-                         `คุณมีความเข้าใจในมาตรฐานสุขอนามัยอาหารและโซลูชันการจัดการ\n` +
-                         `หากต้องการการบริการ คำแนะนำเพิ่มเติมเกี่ยวกับ Food Safety สามารถติดต่อ Dansai Group ได้ที่ Dansai.co.th`;
+    document.getElementById("restart-btn").onclick = () => {
+      currentIndex = 0;
+      scorePart1 = 0;
+      scorePart2 = 0;
+      resultView.style.display = "none";
+      quizView.style.display = "block";
+      loadQuestion();
+    };
 
-      if (liff.isInClient()) {
-        try {
-          await liff.sendMessages([
-            {
-              type: "text",
-              text: summaryMsg
-            }
-          ]);
-        } catch (error) {
-          console.warn("ไม่สามารถส่งข้อความเข้าแชตได้:", error);
-        }
-        liff.closeWindow();
-      } else {
-        alert(summaryMsg);
-      }
-    }
-
-    window.onload = initializeLiff;
+    // Initialize
+    loadQuestion();
   </script>
 </body>
 </html>
