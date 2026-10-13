@@ -6,7 +6,7 @@
   <title>Food Safety & AD9 Solutions Quiz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #0284c7;
@@ -22,15 +22,15 @@
       --incorrect-bg: #fee2e2;
       --incorrect-border: #ef4444;
       --incorrect-text: #b91c1c;
-      --line-green: #06c755;
-      --line-green-hover: #05b04b;
+      --action-green: #06c755;
+      --action-green-hover: #05b04b;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Sarabun', sans-serif;
+      font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -48,9 +48,9 @@
       background: var(--card-bg);
       width: 100%;
       max-width: 680px;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      border-radius: 18px;
+      padding: 32px 28px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
       border: 1px solid var(--border);
       position: relative;
     }
@@ -59,7 +59,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      gap: 12px;
     }
 
     .badge {
@@ -69,7 +70,8 @@
       border-radius: 9999px;
       background-color: #e0f2fe;
       color: #0369a1;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
     }
 
     .badge.part2 {
@@ -78,9 +80,10 @@
     }
 
     .progress-text {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
       font-weight: 600;
+      white-space: nowrap;
     }
 
     .progress-bar-container {
@@ -102,8 +105,8 @@
     .question-title {
       font-size: 1.25rem;
       font-weight: 700;
-      line-height: 1.5;
-      margin-bottom: 24px;
+      line-height: 1.55;
+      margin-bottom: 22px;
       color: var(--text-main);
     }
 
@@ -111,21 +114,22 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .option-btn {
       text-align: left;
       padding: 14px 18px;
       border: 1.5px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       background: white;
       font-size: 1rem;
       color: var(--text-main);
       cursor: pointer;
       transition: background-color 0.15s ease, border-color 0.15s ease;
-      line-height: 1.4;
+      line-height: 1.45;
       outline: none;
+      user-select: none;
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -154,13 +158,13 @@
 
     .explanation-box {
       display: none;
-      padding: 16px;
-      border-radius: 10px;
+      padding: 16px 18px;
+      border-radius: 12px;
       background-color: #f8fafc;
       border-left: 4px solid var(--primary);
-      margin-bottom: 24px;
+      margin-bottom: 22px;
       font-size: 0.95rem;
-      line-height: 1.5;
+      line-height: 1.55;
       color: #334155;
     }
 
@@ -173,7 +177,7 @@
       font-size: 1rem;
       font-weight: 600;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       outline: none;
       transition: background-color 0.2s ease;
@@ -183,60 +187,70 @@
       background-color: var(--primary-hover);
     }
 
-    /* Result View */
     .result-container {
       display: none;
       text-align: center;
     }
 
     .result-title {
-      font-size: 1.75rem;
+      font-size: 1.7rem;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    .result-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .total-score {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      padding: 8px 18px;
+      background-color: #e0f2fe;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-bottom: 20px;
     }
 
     .score-summary-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin: 20px 0 16px 0;
+      gap: 14px;
+      margin-bottom: 18px;
       text-align: left;
     }
 
     .score-card {
       background: #f8fafc;
-      padding: 18px;
+      padding: 16px;
       border-radius: 12px;
       border: 1px solid var(--border);
     }
 
     .score-card h3 {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
+      font-weight: 600;
     }
 
     .score-card .score {
-      font-size: 1.7rem;
+      font-size: 1.65rem;
       font-weight: 700;
       color: var(--primary);
     }
 
-    .total-score {
-      margin-bottom: 8px;
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: #334155;
-    }
-
-    /* Analysis Box */
     .summary-analysis-box {
       text-align: left;
       background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 20px;
-      margin: 20px 0 20px 0;
+      margin: 18px 0 20px 0;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
 
@@ -245,7 +259,7 @@
       font-weight: 700;
       color: #0f172a;
       margin-bottom: 12px;
-      border-bottom: 2px solid #f1f5f9;
+      border-bottom: 1.5px solid #f1f5f9;
       padding-bottom: 8px;
     }
 
@@ -264,17 +278,16 @@
     }
 
     .analysis-part p {
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       line-height: 1.6;
       color: #475569;
     }
 
-    /* Action Buttons */
     .action-buttons-container {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-top: 24px;
+      margin-top: 20px;
     }
 
     .btn-action {
@@ -284,31 +297,24 @@
       gap: 10px;
       width: 100%;
       padding: 14px 20px;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
       border: none;
       transition: all 0.2s ease;
       text-decoration: none;
+      outline: none;
     }
 
-    .btn-line-oa {
-      background-color: var(--line-green);
-      color: white;
+    /* Single Green Action Button */
+    .btn-share-green {
+      background-color: var(--action-green);
+      color: #ffffff;
     }
 
-    .btn-line-oa:hover {
-      background-color: var(--line-green-hover);
-    }
-
-    .btn-copy-result {
-      background-color: #0284c7;
-      color: white;
-    }
-
-    .btn-copy-result:hover {
-      background-color: #0369a1;
+    .btn-share-green:hover {
+      background-color: var(--action-green-hover);
     }
 
     .btn-restart {
@@ -326,27 +332,29 @@
     /* Toast Notification */
     .toast {
       visibility: hidden;
-      min-width: 280px;
+      min-width: 290px;
       background-color: #0f172a;
-      color: #fff;
+      color: #ffffff;
       text-align: center;
-      border-radius: 8px;
-      padding: 12px 20px;
+      border-radius: 9999px;
+      padding: 12px 24px;
       position: fixed;
       z-index: 9999;
-      bottom: 30px;
+      bottom: 28px;
       left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.95rem;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateX(-50%) translateY(20px);
+      font-size: 0.92rem;
+      font-weight: 500;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
       opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
     }
 
     .toast.show {
       visibility: visible;
       opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     @media (max-width: 540px) {
@@ -354,7 +362,7 @@
         grid-template-columns: 1fr;
       }
       .quiz-card {
-        padding: 24px;
+        padding: 24px 18px;
       }
     }
   </style>
@@ -362,6 +370,7 @@
 <body>
 
   <div class="quiz-card">
+    
     <!-- Active Quiz View -->
     <div id="quiz-view">
       <div class="header">
@@ -381,8 +390,10 @@
 
     <!-- Final Result View -->
     <div id="result-view" class="result-container">
-      <h2 class="result-title">สรุปผลการประเมิน</h2>
-      <p class="total-score" id="total-score-text"></p>
+      <h2 class="result-title">สรุปผลการประเมิน Pre-test</h2>
+      <p class="result-subtitle">แบบทดสอบสุขอนามัยอาหารและโซลูชัน AD9 (Dansai Group)</p>
+      
+      <div class="total-score" id="total-score-text">คะแนนรวม: 0 จาก 11 คะแนน (0%)</div>
 
       <div class="score-summary-grid">
         <div class="score-card">
@@ -410,48 +421,35 @@
         </div>
       </div>
 
-      <!-- Actions -->
+      <!-- Single Action Share Button in Green -->
       <div class="action-buttons-container">
-        <!-- 1. Send to LINE OA -->
-        <button id="send-line-btn" class="btn-action btn-line-oa" onclick="handleSendToLine()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 5.92 2 10.74c0 3.29 2.11 6.17 5.29 7.63-.23.86-.82 3.12-.94 3.6-.14.56.2.55.43.4.17-.11 2.37-1.61 3.33-2.27.61.09 1.24.14 1.89.14 5.52 0 10-3.92 10-8.74S17.52 2 12 2z"/>
+        <button id="share-btn" class="btn-action btn-share-green" type="button" onclick="handleShareResult()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
-          ส่งผลประเมินเข้า LINE Official Account
+          แชร์ / คัดลอกผลลัพธ์ (Share / Copy Result)
         </button>
 
-        <!-- 2. Copy Text for Other Apps -->
-        <button id="copy-result-btn" class="btn-action btn-copy-result" onclick="copyResultText()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-          คัดลอกข้อความสรุปผล (พร้อมแชร์แอปอื่น)
-        </button>
-
-        <!-- 3. Restart Quiz -->
-        <button id="restart-btn" class="btn-action btn-restart" onclick="restartQuiz()">
+        <button id="restart-btn" class="btn-action btn-restart" type="button" onclick="restartQuiz()">
           ทำแบบทดสอบอีกครั้ง
         </button>
       </div>
     </div>
   </div>
 
-  <div id="toast" class="toast">คัดลอกข้อความผลลัพธ์เรียบร้อยแล้ว! พร้อมวางในแอปอื่นทันที</div>
+  <div id="toast" class="toast">คัดลอกข้อความผลลัพธ์แล้ว! พร้อมนำไปวางในแอปอื่นได้ทันที</div>
 
   <script>
-    // ==========================================
-    // ⚙️ CONFIGURATION
-    // ==========================================
-    // ใส่ LINE OA ID ของ Dansai Group (มี @ หรือไม่มีก็ได้)
-    const LINE_OA_ID = "@dansaigroup"; 
-
     const questions = [
-      // Part 1: Basic Food Hygiene
+      // Part 1: Basic Food Hygiene (1 to 6)
       {
         part: 1,
         partLabel: "ส่วนที่ 1: Basic Food Hygiene",
-        question: "ช่วงอุณหภูมิใดถือเป็นโซนอันตราย (Temperature Danger Zone: TDZ) ที่แบคทีเรียส่วนใหญ่เจริญเติบโตและแบ่งตัวได้อย่างรวดเร็วที่สุด?",
+        question: "1. ช่วงอุณหภูมิใดถือเป็นโซนอันตราย (Temperature Danger Zone: TDZ) ที่แบคทีเรียส่วนใหญ่เจริญเติบโตและแบ่งตัวได้อย่างรวดเร็วที่สุด?",
         options: [
           "ช่วงอุณหภูมิ -18°C ถึง 0°C",
           "ช่วงอุณหภูมิ 5°C ถึง 60°C",
@@ -464,7 +462,7 @@
       {
         part: 1,
         partLabel: "ส่วนที่ 1: Basic Food Hygiene",
-        question: "ตามหลักมาตรฐานสากลด้านการแยกสีเขียงเพื่อป้องกันการปนเปื้อนข้าม (Cross-contamination) เขียง 'สีแดง' และ 'สีเขียว' ถูกกำหนดให้ใช้กับวัตถุดิบประเภทใดตามลำดับ?",
+        question: "2. ตามหลักมาตรฐานสากลด้านการแยกสีเขียงเพื่อป้องกันการปนเปื้อนข้าม (Cross-contamination) เขียง 'สีแดง' และ 'สีเขียว' ถูกกำหนดให้ใช้กับวัตถุดิบประเภทใดตามลำดับ?",
         options: [
           "เนื้อสัตว์ดิบ และ ผักสดผลไม้",
           "อาหารทะเลดิบ และ สัตว์ปีกดิบ",
@@ -477,7 +475,7 @@
       {
         part: 1,
         partLabel: "ส่วนที่ 1: Basic Food Hygiene",
-        question: "เชื้อแบคทีเรียชนิดใดที่พบบ่อยมากในเนื้อไก่ดิบและเปลือกไข่ดิบ ซึ่งเป็นสาเหตุหลักที่ทำให้เกิดอาการท้องเสียรุนแรง ไข้ขึ้น และปวดท้องเฉียบพลัน?",
+        question: "3. เชื้อแบคทีเรียชนิดใดที่พบบ่อยมากในเนื้อไก่ดิบและเปลือกไข่ดิบ ซึ่งเป็นสาเหตุหลักที่ทำให้เกิดอาการท้องเสียรุนแรง ไข้ขึ้น และปวดท้องเฉียบพลัน?",
         options: [
           "เชื้อราบนขนมปัง (Mold)",
           "ยีสต์หมักอาหาร (Yeast)",
@@ -490,7 +488,7 @@
       {
         part: 1,
         partLabel: "ส่วนที่ 1: Basic Food Hygiene",
-        question: "การจัดเก็บอาหารในตู้เย็นตามหลักสุขาภิบาลที่ถูกต้องเพื่อป้องกันน้ำหยดปนเปื้อนข้าม ควรวาง 'เนื้อสัตว์ดิบ' ไว้ที่ตำแหน่งใด?",
+        question: "4. การจัดเก็บอาหารในตู้เย็นตามหลักสุขาภิบาลที่ถูกต้องเพื่อป้องกันน้ำหยดปนเปื้อนข้าม ควรวาง 'เนื้อสัตว์ดิบ' ไว้ที่ตำแหน่งใด?",
         options: [
           "ชั้นบนสุดติดช่องแช่แข็ง",
           "วางรวมกับอาหารปรุงสุกพร้อมทาน",
@@ -503,7 +501,7 @@
       {
         part: 1,
         partLabel: "ส่วนที่ 1: Basic Food Hygiene",
-        question: "ตามกฎความปลอดภัยอาหารสากล 'กฎ 2 ชั่วโมง / 4 ชั่วโมง' กำหนดแนวทางการปฏิบัติกับอาหารปรุงสุกที่วางอยู่ในโซนอันตรายไว้อย่างไร?",
+        question: "5. ตามกฎความปลอดภัยอาหารสากล 'กฎ 2 ชั่วโมง / 4 ชั่วโมง' กำหนดแนวทางการปฏิบัติกับอาหารปรุงสุกที่วางอยู่ในโซนอันตรายไว้อย่างไร?",
         options: [
           "วางได้สูงสุด 24 ชั่วโมงหากมีฝาครอบ",
           "ต้องทิ้งทันทีหากวางไว้นานเกิน 4 ชั่วโมง",
@@ -516,7 +514,7 @@
       {
         part: 1,
         partLabel: "ส่วนที่ 1: Basic Food Hygiene",
-        question: "พฤติกรรมใดในการล้างมือของผู้ปฏิบัติงานในครัวถือว่าถูกต้องตามมาตรฐานสุขาภิบาลอาหารมากที่สุด?",
+        question: "6. พฤติกรรมใดในการล้างมือของผู้ปฏิบัติงานในครัวถือว่าถูกต้องตามมาตรฐานสุขาภิบาลอาหารมากที่สุด?",
         options: [
           "ล้างด้วยน้ำเปล่าอย่างรวดเร็ว 5 วินาที",
           "ใช้แอลกอฮอล์เจลแทนการล้างมือแม้มีคราบไขมันติดมือ",
@@ -527,11 +525,11 @@
         explanation: "การล้างมือที่ถูกต้องต้องฟอกสบู่ให้ทั่วฝ่ามือ ซอกนิ้ว ข้อมือ และใต้เล็บเป็นเวลาอย่างน้อย 20 วินาที แล้วเช็ดให้แห้งด้วยกระดาษชำระแบบใช้ครั้งเดียวทิ้ง"
       },
 
-      // Part 2: AD9 Solutions
+      // Part 2: AD9 Solutions (7 to 11)
       {
         part: 2,
         partLabel: "ส่วนที่ 2: AD9 Solutions",
-        question: "ในแง่ของการบริหารความเสี่ยงด้านสุขอนามัยอาหาร (Food Safety Risk Management) ประโยชน์เชิงปฏิบัติที่สำคัญที่สุดของ AD9 Solutions คือข้อใด?",
+        question: "7. ในแง่ของการบริหารความเสี่ยงด้านสุขอนามัยอาหาร (Food Safety Risk Management) ประโยชน์เชิงปฏิบัติที่สำคัญที่สุดของ AD9 Solutions คือข้อใด?",
         options: [
           "การยกเลิกกระบวนการล้างทำความสะอาดในสถานประกอบการ",
           "การตรวจจับการปนเปื้อนข้ามและเชื้อจุลินทรีย์ที่มองไม่เห็นเพื่อสกัดความเสี่ยงล่วงหน้า",
@@ -544,7 +542,7 @@
       {
         part: 2,
         partLabel: "ส่วนที่ 2: AD9 Solutions",
-        question: "AD9 Solutions ช่วยส่งเสริมการขอรับรองมาตรฐานด้านสุขาภิบาลอาหาร เช่น เกณฑ์มาตรฐาน SAN และ SAN+ อย่างไร?",
+        question: "8. AD9 Solutions ช่วยส่งเสริมการขอรับรองมาตรฐานด้านสุขาภิบาลอาหาร เช่น เกณฑ์มาตรฐาน SAN และ SAN+ อย่างไร?",
         options: [
           "การรวบรวมหลักฐานและบันทึกผลการตรวจสอบอย่างเป็นระบบเพื่อรองรับการตรวจประเมิน",
           "การออกใบรับรองมาตรฐานความปลอดภัยอาหารระดับสากลให้สถานประกอบการได้ทันที",
@@ -557,7 +555,7 @@
       {
         part: 2,
         partLabel: "ส่วนที่ 2: AD9 Solutions",
-        question: "เมื่อเชื่อมโยง AD9 Solutions เข้ากับแพลตฟอร์มจัดการข้อมูล (เช่น แดชบอร์ดหรือ Vservesafe) ประโยชน์ที่ผู้บริหารสถานประกอบการจะได้รับคืออะไร?",
+        question: "9. เมื่อเชื่อมโยง AD9 Solutions เข้ากับแพลตฟอร์มจัดการข้อมูล (เช่น แดชบอร์ดหรือ Vservesafe) ประโยชน์ที่ผู้บริหารสถานประกอบการจะได้รับคืออะไร?",
         options: [
           "การติดตามสถานะสุขอนามัยแบบเรียลไทม์เพื่อระบุจุดบกพร่องและแก้ไขได้ทันที",
           "การคำนวณกำไรขาดทุนของเมนูอาหารแต่ละจานแบบอัตโนมัติ",
@@ -570,7 +568,7 @@
       {
         part: 2,
         partLabel: "ส่วนที่ 2: AD9 Solutions",
-        question: "ในมุมมองด้านความคุ้มค่าของการดำเนินงาน (Operational Efficiency) การนำ AD9 Solutions มาใช้ช่วยลดต้นทุนแฝงของธุรกิจได้อย่างไร?",
+        question: "10. ในมุมมองด้านความคุ้มค่าของการดำเนินงาน (Operational Efficiency) การนำ AD9 Solutions มาใช้ช่วยลดต้นทุนแฝงของธุรกิจได้อย่างไร?",
         options: [
           "การลดเวลาการตรวจสอบแบบเอกสารกระดาษและป้องกันความสูญเสียจากวิกฤตแบรนด์",
           "การลดค่าใช้จ่ายด้านสาธารณูปโภค เช่น ค่าน้ำและค่าไฟฟ้าในครัว",
@@ -583,7 +581,7 @@
       {
         part: 2,
         partLabel: "ส่วนที่ 2: AD9 Solutions",
-        question: "ประโยชน์ที่ส่งผลต่อการสร้างความเชื่อมั่นของผู้บริโภค (Customer Trust) จากการประยุกต์ใช้ AD9 Solutions คือข้อใด?",
+        question: "11. ประโยชน์ที่ส่งผลต่อการสร้างความเชื่อมั่นของผู้บริโภค (Customer Trust) จากการประยุกต์ใช้ AD9 Solutions คือข้อใด?",
         options: [
           "การแสดงให้เห็นถึงมาตรฐานความปลอดภัยอาหารที่ตรวจสอบย้อนกลับและยืนยันได้",
           "การมอบส่วนลดราคาอาหารให้แก่ลูกค้าที่มาใช้บริการ",
@@ -610,6 +608,7 @@
     const nextBtn = document.getElementById("next-btn");
 
     function loadQuestion() {
+      // Clear previous focus to eliminate button ghosting on transitions
       if (document.activeElement && typeof document.activeElement.blur === "function") {
         document.activeElement.blur();
       }
@@ -701,23 +700,22 @@
       if (scorePart1 === 6) {
         p1El.innerText = "ระดับยอดเยี่ยม! คุณมี Food Safety Mindset ที่แข็งแกร่ง พร้อมนำไปเป็นต้นแบบในการดูแลสุขอนามัยของครัวและองค์กรได้อย่างปลอดภัย";
       } else if (scorePart1 >= 4) {
-        p1El.innerText = "ระดับดีมาก! ความรู้พื้นฐานแน่นหนา มีความเข้าใจเรื่องจุดเสี่ยงสำคัญ พร้อมพัฒนาต่อยอดสู่ขั้นตอนปฏิบัติงานจริงที่รัดกุมยิ่งขึ้น";
+        p1El.innerText = "ระดับดี! ความรู้พื้นฐานแน่นหนา มีความเข้าใจเรื่องจุดเสี่ยงสำคัญ พร้อมพัฒนาต่อยอดสู่ขั้นตอนปฏิบัติงานจริงที่รัดกุมยิ่งขึ้น";
       } else {
         p1El.innerText = "จุดเริ่มต้นที่ดี! การเข้าร่วมกิจกรรมในวันนี้จะช่วยอุดรอยต่อเรื่องช่วงอุณหภูมิอันตราย (TDZ) และการสกัดการปนเปื้อนข้ามได้อย่างสมบูรณ์";
       }
 
-      // Feedback Part 2
+      // Feedback Part 2 (Dansai Consultation Guidance)
       const p2El = document.getElementById("part2-feedback-text");
       if (scorePart2 === 5) {
         p2El.innerText = "ระดับยอดเยี่ยม! คุณเห็นภาพประโยชน์ของนวัตกรรมดิจิทัลเพื่อความปลอดภัยอาหารอย่างชัดเจน หากต้องการต่อยอดวางระบบ AD9 หรือ Real-time Monitoring เพื่อเตรียมพร้อมรับรองมาตรฐาน SAN / SAN+ ทีมงาน Dansai Group ยินดีให้คำปรึกษาและออกแบบระบบร่วมกับคุณครับ";
       } else if (scorePart2 >= 3) {
-        p2El.innerText = "ระดับดีมาก! คุณเข้าใจแนวคิดหลักในการใช้นวัตกรรมสกัดความเสี่ยงอาหารได้เป็นอย่างดี สำหรับการใช้แดชบอร์ดจริงเพื่อลดต้นทุนแฝง ทีม Dansai Group พร้อมให้คำแนะนำและพาทดลองใช้เครื่องมือเพิ่มเติมเพื่อยกระดับครัวสู่มาตรฐานสากลครับ";
+        p2El.innerText = "ระดับดี! คุณเข้าใจแนวคิดหลักในการใช้นวัตกรรมสกัดความเสี่ยงอาหารได้เป็นอย่างดี สำหรับการใช้แดชบอร์ดจริงเพื่อลดต้นทุนแฝง ทีม Dansai Group พร้อมให้คำแนะนำและพาทดลองใช้เครื่องมือเพิ่มเติมเพื่อยกระดับครัวสู่มาตรฐานสากลครับ";
       } else {
         p2El.innerText = "เริ่มต้นได้ดี! เทคโนโลยีด้านความปลอดภัยอาหารยุคใหม่ยังมีรายละเอียดที่น่าสนใจอีกมาก หากต้องการปูพื้นฐานแนวคิด หรือเตรียมรับมาตรฐาน SAN / SAN+ ให้ผ่านฉลุย สามารถปรึกษาและขอรับบริการตรวจประเมินเบื้องต้นกับทีมผู้เชี่ยวชาญ Dansai Group ได้เลยครับ";
       }
     }
 
-    // Build the formatted text output
     function getSummaryPayload() {
       const totalScore = scorePart1 + scorePart2;
       const totalQuestions = questions.length;
@@ -729,12 +727,11 @@
 - ส่วนที่ 1 (Basic Hygiene): ${scorePart1}/6
 - ส่วนที่ 2 (AD9 Solutions): ${scorePart2}/5
 ----------------------------------
-💡 ปรึกษาการยกระดับมาตรฐานความปลอดภัยอาหาร & โซลูชัน AD9 ได้ที่ Dansai Group
+💡 ปรึกษาการยกระดับมาตรฐานความปลอดภัยอาหาร & โซลูชัน AD9 ได้ที่ Dansai Group (www.dansai.co.th)
 
 #DansaiGroup #VServeSafe #AD9 #FoodSafety #FoodSafetyCulture #Hospitality #Hotel #Restaurant`;
     }
 
-    // Toast helper
     function showToast(msg) {
       const toast = document.getElementById("toast");
       if (msg) toast.innerText = msg;
@@ -744,12 +741,10 @@
       }, 3500);
     }
 
-    // Robust Clipboard Copy Function
     function executeCopy(text) {
       if (navigator.clipboard && window.isSecureContext) {
         return navigator.clipboard.writeText(text);
       } else {
-        // Fallback for older browsers / http contexts
         const textArea = document.createElement("textarea");
         textArea.value = text;
         textArea.style.position = "fixed";
@@ -764,34 +759,26 @@
       }
     }
 
-    // 🟢 1. Send to LINE OA (Auto-copies result + launches LINE app & target chat)
-    function handleSendToLine() {
+    // Single Green Action Button: Web Share API with Clipboard Fallback
+    function handleShareResult() {
       const payload = getSummaryPayload();
-      const cleanId = LINE_OA_ID.replace(/^@/, "");
 
-      // Step 1: Copy to clipboard immediately to ensure user never loses text
-      executeCopy(payload).catch(e => console.log(e));
-
-      // Step 2: Open LINE chat directly with fallback
-      // https://line.me/R/oaMessage/ launches native LINE chat with draft message
-      const oaUrl = `https://line.me/R/oaMessage/%40${cleanId}/?${encodeURIComponent(payload)}`;
-      
-      showToast("กำลังเปิด LINE... (หากข้อความไม่ขึ้น สามารถกดวาง Paste ได้เลยครับ)");
-
-      // Use window.location to trigger native app intent
-      setTimeout(() => {
-        window.location.href = oaUrl;
-      }, 400);
-    }
-
-    // 📋 2. Copy Result Text (Ready to paste anywhere)
-    function copyResultText() {
-      const payload = getSummaryPayload();
-      executeCopy(payload).then(() => {
-        showToast("คัดลอกข้อความสรุปผลเรียบร้อยแล้ว! พร้อมวางในแอปอื่นทันที");
-      }).catch(() => {
-        alert("ไม่สามารถคัดลอกอัตโนมัติได้ กรุณาลองใหม่อีกครั้ง");
-      });
+      if (navigator.share) {
+        navigator.share({
+          title: "ผลการประเมิน Food Safety & AD9 Solutions",
+          text: payload
+        }).catch(err => {
+          if (err.name !== 'AbortError') {
+            executeCopy(payload).then(() => showToast());
+          }
+        });
+      } else {
+        executeCopy(payload).then(() => {
+          showToast();
+        }).catch(() => {
+          alert("ไม่สามารถแชร์ได้ กรุณาลองใหม่อีกครั้ง");
+        });
+      }
     }
 
     function restartQuiz() {
@@ -803,7 +790,7 @@
       loadQuestion();
     }
 
-    // Initialize
+    // Initialize Quiz
     loadQuestion();
   </script>
 </body>
