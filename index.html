@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- LINE LIFF SDK v2 -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     :root {
       --primary: #0284c7;
@@ -53,6 +55,31 @@
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
       border: 1px solid var(--border);
       position: relative;
+    }
+
+    .user-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 9999px;
+      object-fit: cover;
+      background-color: #e2e8f0;
+      display: none;
+    }
+
+    .user-name-bold {
+      font-weight: 600;
+      color: var(--text-main);
     }
 
     .header {
@@ -307,13 +334,18 @@
       outline: none;
     }
 
+    .btn-action:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
     /* Single Green Action Button */
     .btn-share-green {
       background-color: var(--action-green);
       color: #ffffff;
     }
 
-    .btn-share-green:hover {
+    .btn-share-green:hover:not(:disabled) {
       background-color: var(--action-green-hover);
     }
 
@@ -324,7 +356,7 @@
       padding: 12px 20px;
     }
 
-    .btn-restart:hover {
+    .btn-restart:hover:not(:disabled) {
       background-color: #f8fafc;
       color: var(--text-main);
     }
@@ -370,6 +402,11 @@
 <body>
 
   <div class="quiz-card">
+
+    <div class="user-bar">
+      <img id="user-avatar" class="user-avatar" alt="User Avatar">
+      <span>ผู้ทำแบบทดสอบ: <span id="user-name" class="user-name-bold">กำลังโหลดข้อมูล...</span></span>
+    </div>
     
     <!-- Active Quiz View -->
     <div id="quiz-view">
@@ -431,7 +468,7 @@
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
-          แชร์ผลลัพธ์ (Share Result)
+          ส่ง Flex Message & บันทึกผล
         </button>
 
         <button id="restart-btn" class="btn-action btn-restart" type="button" onclick="restartQuiz()">
@@ -441,9 +478,13 @@
     </div>
   </div>
 
-  <div id="toast" class="toast">คัดลอกข้อความผลลัพธ์แล้ว! พร้อมนำไปวางในแอปอื่นได้ทันที</div>
+  <div id="toast" class="toast">บันทึกผลและส่ง Flex Message เรียบร้อยแล้ว</div>
 
   <script>
+    // === ตั้งค่า LIFF ID และ Google Apps Script Web App URL ===
+    const MY_LIFF_ID = "2011998700-oIjeMpys";
+    const GAS_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwX9PORreLCU2V0tJnb1CHvp6YxLUzQLrJsQM2Z1NkQIy8tRPa73jePydk4LtaTA9Fr/exec";
+
     const questions = [
       // Part 1: Basic Food Hygiene (1 to 6)
       {
@@ -596,6 +637,7 @@
     let currentIndex = 0;
     let scorePart1 = 0;
     let scorePart2 = 0;
+    let userProfile = { displayName: "ผู้เข้าร่วมทดสอบ", userId: "" };
 
     const quizView = document.getElementById("quiz-view");
     const resultView = document.getElementById("result-view");
@@ -607,8 +649,36 @@
     const explanationContainer = document.getElementById("explanation-container");
     const nextBtn = document.getElementById("next-btn");
 
+    async function initializeLiff() {
+      try {
+        if (MY_LIFF_ID && MY_LIFF_ID !== "YOUR_LIFF_ID_HERE") {
+          await liff.init({ liffId: MY_LIFF_ID });
+          if (!liff.isLoggedIn()) {
+            liff.login();
+            return;
+          }
+          const profile = await liff.getProfile();
+          userProfile = {
+            displayName: profile.displayName || "ผู้เข้าร่วมทดสอบ",
+            userId: profile.userId || ""
+          };
+          document.getElementById("user-name").innerText = userProfile.displayName;
+          if (profile.pictureUrl) {
+            const avatar = document.getElementById("user-avatar");
+            avatar.src = profile.pictureUrl;
+            avatar.style.display = "block";
+          }
+        } else {
+          document.getElementById("user-name").innerText = userProfile.displayName;
+        }
+      } catch (err) {
+        console.warn("LIFF init warning:", err);
+        document.getElementById("user-name").innerText = userProfile.displayName;
+      }
+      loadQuestion();
+    }
+
     function loadQuestion() {
-      // Clear previous focus to eliminate button ghosting on transitions
       if (document.activeElement && typeof document.activeElement.blur === "function") {
         document.activeElement.blur();
       }
@@ -623,7 +693,7 @@
       }
 
       progressIndicator.innerText = `ข้อ ${currentIndex + 1}/${questions.length}`;
-      progressBar.style.width = `${((currentIndex) / questions.length) * 100}%`;
+      progressBar.style.width = `${(currentIndex / questions.length) * 100}%`;
 
       questionText.innerText = q.question;
       optionsContainer.innerHTML = "";
@@ -676,60 +746,210 @@
       }
     };
 
+    function getEvaluationData() {
+      const totalScore = scorePart1 + scorePart2;
+      const totalQuestions = questions.length;
+      const percentTotal = Math.round((totalScore / totalQuestions) * 100);
+
+      let p1Feedback = "";
+      if (scorePart1 === 6) {
+        p1Feedback = "ระดับยอดเยี่ยม! คุณมี Food Safety Mindset ที่แข็งแกร่ง พร้อมนำไปเป็นต้นแบบในการดูแลสุขอนามัยของครัวและองค์กรได้อย่างปลอดภัย";
+      } else if (scorePart1 >= 4) {
+        p1Feedback = "ระดับดี! ความรู้พื้นฐานแน่นหนา มีความเข้าใจเรื่องจุดเสี่ยงสำคัญ พร้อมพัฒนาต่อยอดสู่ขั้นตอนปฏิบัติงานจริงที่รัดกุมยิ่งขึ้น";
+      } else {
+        p1Feedback = "จุดเริ่มต้นที่ดี! การเข้าร่วมกิจกรรมในวันนี้จะช่วยอุดรอยต่อเรื่องช่วงอุณหภูมิอันตราย (TDZ) และการสกัดการปนเปื้อนข้ามได้อย่างสมบูรณ์";
+      }
+
+      let p2Feedback = "";
+      if (scorePart2 === 5) {
+        p2Feedback = "ระดับยอดเยี่ยม! คุณเห็นภาพประโยชน์ของนวัตกรรมดิจิทัลเพื่อความปลอดภัยอาหารอย่างชัดเจน หากต้องการต่อยอดวางระบบ AD9 หรือ Real-time Monitoring เพื่อเตรียมพร้อมรับรองมาตรฐาน SAN / SAN+ ทีมงาน Dansai Group ยินดีให้คำปรึกษาและออกแบบระบบร่วมกับคุณครับ";
+      } else if (scorePart2 >= 3) {
+        p2Feedback = "ระดับดี! คุณเข้าใจแนวคิดหลักในการใช้นวัตกรรมสกัดความเสี่ยงอาหารได้เป็นอย่างดี สำหรับการใช้แดชบอร์ดจริงเพื่อลดต้นทุนแฝง ทีม Dansai Group พร้อมให้คำแนะนำและพาทดลองใช้เครื่องมือเพิ่มเติมเพื่อยกระดับครัวสู่มาตรฐานสากลครับ";
+      } else {
+        p2Feedback = "เริ่มต้นได้ดี! เทคโนโลยีด้านความปลอดภัยอาหารยุคใหม่ยังมีรายละเอียดที่น่าสนใจอีกมาก หากต้องการปูพื้นฐานแนวคิด หรือเตรียมรับมาตรฐาน SAN / SAN+ ให้ผ่านฉลุย สามารถปรึกษาและขอรับบริการตรวจประเมินเบื้องต้นกับทีมผู้เชี่ยวชาญ Dansai Group ได้เลยค่ะ";
+      }
+
+      return { totalScore, totalQuestions, percentTotal, p1Feedback, p2Feedback };
+    }
+
     function showResults() {
       quizView.style.display = "none";
       resultView.style.display = "block";
 
-      const totalScore = scorePart1 + scorePart2;
-      const totalQuestions = questions.length;
-      const percentTotal = Math.round((totalScore / totalQuestions) * 100);
+      const evalData = getEvaluationData();
 
-      document.getElementById("total-score-text").innerText = 
-        `คะแนนรวม: ${totalScore} จาก ${totalQuestions} คะแนน (${percentTotal}%)`;
+      document.getElementById("total-score-text").innerText =
+        `คะแนนรวม: ${evalData.totalScore} จาก ${evalData.totalQuestions} คะแนน (${evalData.percentTotal}%)`;
 
       document.getElementById("part1-score-text").innerText = `${scorePart1} / 6`;
-      document.getElementById("part1-desc").innerText = 
+      document.getElementById("part1-desc").innerText =
         `คิดเป็น ${Math.round((scorePart1 / 6) * 100)}% (สุขอนามัยพื้นฐาน)`;
 
       document.getElementById("part2-score-text").innerText = `${scorePart2} / 5`;
-      document.getElementById("part2-desc").innerText = 
+      document.getElementById("part2-desc").innerText =
         `คิดเป็น ${Math.round((scorePart2 / 5) * 100)}% (ระบบ AD9 Solutions)`;
 
-      // Feedback Part 1
-      const p1El = document.getElementById("part1-feedback-text");
-      if (scorePart1 === 6) {
-        p1El.innerText = "ระดับยอดเยี่ยม! คุณมี Food Safety Mindset ที่แข็งแกร่ง พร้อมนำไปเป็นต้นแบบในการดูแลสุขอนามัยของครัวและองค์กรได้อย่างปลอดภัย";
-      } else if (scorePart1 >= 4) {
-        p1El.innerText = "ระดับดี! ความรู้พื้นฐานแน่นหนา มีความเข้าใจเรื่องจุดเสี่ยงสำคัญ พร้อมพัฒนาต่อยอดสู่ขั้นตอนปฏิบัติงานจริงที่รัดกุมยิ่งขึ้น";
-      } else {
-        p1El.innerText = "จุดเริ่มต้นที่ดี! การเข้าร่วมกิจกรรมในวันนี้จะช่วยอุดรอยต่อเรื่องช่วงอุณหภูมิอันตราย (TDZ) และการสกัดการปนเปื้อนข้ามได้อย่างสมบูรณ์";
-      }
-
-      // Feedback Part 2 (Dansai Consultation Guidance)
-      const p2El = document.getElementById("part2-feedback-text");
-      if (scorePart2 === 5) {
-        p2El.innerText = "ระดับยอดเยี่ยม! คุณเห็นภาพประโยชน์ของนวัตกรรมดิจิทัลเพื่อความปลอดภัยอาหารอย่างชัดเจน หากต้องการต่อยอดวางระบบ AD9 หรือ Real-time Monitoring เพื่อเตรียมพร้อมรับรองมาตรฐาน SAN / SAN+ ทีมงาน Dansai Group ยินดีให้คำปรึกษาและออกแบบระบบร่วมกับคุณครับ";
-      } else if (scorePart2 >= 3) {
-        p2El.innerText = "ระดับดี! คุณเข้าใจแนวคิดหลักในการใช้นวัตกรรมสกัดความเสี่ยงอาหารได้เป็นอย่างดี สำหรับการใช้แดชบอร์ดจริงเพื่อลดต้นทุนแฝง ทีม Dansai Group พร้อมให้คำแนะนำและพาทดลองใช้เครื่องมือเพิ่มเติมเพื่อยกระดับครัวสู่มาตรฐานสากลครับ";
-      } else {
-        p2El.innerText = "เริ่มต้นได้ดี! เทคโนโลยีด้านความปลอดภัยอาหารยุคใหม่ยังมีรายละเอียดที่น่าสนใจอีกมาก หากต้องการปูพื้นฐานแนวคิด หรือเตรียมรับมาตรฐาน SAN / SAN+ ให้ผ่านฉลุย สามารถปรึกษาและขอรับบริการตรวจประเมินเบื้องต้นกับทีมผู้เชี่ยวชาญ Dansai Group ได้เลยค่ะ";
-      }
+      document.getElementById("part1-feedback-text").innerText = evalData.p1Feedback;
+      document.getElementById("part2-feedback-text").innerText = evalData.p2Feedback;
     }
 
-    function getSummaryPayload() {
-      const totalScore = scorePart1 + scorePart2;
-      const totalQuestions = questions.length;
-      const percentTotal = Math.round((totalScore / totalQuestions) * 100);
+    async function saveResultToSheet(evalData) {
+      if (!GAS_SHEET_WEBHOOK_URL || GAS_SHEET_WEBHOOK_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
+        console.warn("ยังไม่ได้ตั้งค่า GAS_SHEET_WEBHOOK_URL");
+        return;
+      }
 
-      return `📋 ผลการประเมินความรู้ Food Safety & AD9 Solutions
-----------------------------------
-🎯 คะแนนรวม: ${totalScore}/${totalQuestions} คะแนน (${percentTotal}%)
-- ส่วนที่ 1 (Basic Hygiene): ${scorePart1}/6
-- ส่วนที่ 2 (AD9 Solutions): ${scorePart2}/5
-----------------------------------
-💡 ปรึกษาการยกระดับมาตรฐานความปลอดภัยอาหาร & โซลูชัน AD9 ได้ที่ Dansai Group (www.dansai.co.th)
+      const payload = {
+        displayName: userProfile.displayName,
+        userId: userProfile.userId,
+        totalScore: evalData.totalScore,
+        maxScore: evalData.totalQuestions,
+        percentTotal: evalData.percentTotal,
+        scorePart1: scorePart1,
+        scorePart2: scorePart2,
+        part1Feedback: evalData.p1Feedback,
+        part2Feedback: evalData.p2Feedback
+      };
 
-#DansaiGroup #VServeSafe #AD9 #FoodSafety #FoodSafetyCulture #Hospitality #Hotel #Restaurant`;
+      await fetch(GAS_SHEET_WEBHOOK_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    function buildFlexMessage(evalData) {
+      return {
+        type: "flex",
+        altText: `สรุปผล Pre-test Food Safety & AD9: ${evalData.totalScore}/${evalData.totalQuestions} คะแนน (${evalData.percentTotal}%)`,
+        contents: {
+          type: "bubble",
+          size: "mega",
+          header: {
+            type: "box",
+            layout: "vertical",
+            backgroundColor: "#0284c7",
+            paddingAll: "16px",
+            contents: [
+              {
+                type: "text",
+                text: "DANSAI GROUP • AD9 SOLUTIONS",
+                color: "#bae6fd",
+                size: "xs",
+                weight: "bold"
+              },
+              {
+                type: "text",
+                text: "สรุปผลการประเมิน Pre-test",
+                color: "#ffffff",
+                size: "lg",
+                weight: "bold",
+                margin: "xs"
+              },
+              {
+                type: "text",
+                text: `ผู้ทำแบบทดสอบ: ${userProfile.displayName}`,
+                color: "#e0f2fe",
+                size: "xs",
+                margin: "xs"
+              }
+            ]
+          },
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "md",
+            paddingAll: "16px",
+            contents: [
+              {
+                type: "box",
+                layout: "baseline",
+                contents: [
+                  {
+                    type: "text",
+                    text: `${evalData.totalScore}/${evalData.totalQuestions}`,
+                    size: "xxl",
+                    weight: "bold",
+                    color: "#0284c7",
+                    flex: 0
+                  },
+                  {
+                    type: "text",
+                    text: ` คะแนน (${evalData.percentTotal}%)`,
+                    size: "sm",
+                    color: "#475569",
+                    margin: "sm"
+                  }
+                ]
+              },
+              { type: "separator" },
+              {
+                type: "box",
+                layout: "vertical",
+                spacing: "xs",
+                contents: [
+                  {
+                    type: "text",
+                    text: `• ส่วนที่ 1 (Basic Hygiene): ${scorePart1}/6`,
+                    size: "sm",
+                    weight: "bold",
+                    color: "#0f172a"
+                  },
+                  {
+                    type: "text",
+                    text: evalData.p1Feedback,
+                    size: "xs",
+                    color: "#475569",
+                    wrap: true
+                  },
+                  {
+                    type: "text",
+                    text: `• ส่วนที่ 2 (AD9 Solutions): ${scorePart2}/5`,
+                    size: "sm",
+                    weight: "bold",
+                    color: "#b45309",
+                    margin: "sm"
+                  },
+                  {
+                    type: "text",
+                    text: evalData.p2Feedback,
+                    size: "xs",
+                    color: "#475569",
+                    wrap: true
+                  }
+                ]
+              },
+              { type: "separator" },
+              {
+                type: "text",
+                text: "ปรึกษาการยกระดับมาตรฐานความปลอดภัยอาหาร & โซลูชัน AD9 ได้ที่ Dansai Group (www.dansai.co.th)",
+                size: "xs",
+                color: "#64748b",
+                wrap: true
+              }
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            paddingAll: "12px",
+            contents: [
+              {
+                type: "button",
+                style: "primary",
+                color: "#06c755",
+                height: "sm",
+                action: {
+                  type: "uri",
+                  label: "ดูข้อมูล AD9 Solutions",
+                  uri: "https://www.dansai.co.th/?page_id=249"
+                }
+              }
+            ]
+          }
+        }
+      };
     }
 
     function showToast(msg) {
@@ -741,43 +961,39 @@
       }, 3500);
     }
 
-    function executeCopy(text) {
-      if (navigator.clipboard && window.isSecureContext) {
-        return navigator.clipboard.writeText(text);
-      } else {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-999999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        return new Promise((resolve, reject) => {
-          document.execCommand('copy') ? resolve() : reject();
-          textArea.remove();
-        });
-      }
-    }
+    async function handleShareResult() {
+      const shareBtn = document.getElementById("share-btn");
+      const restartBtn = document.getElementById("restart-btn");
+      shareBtn.disabled = true;
+      restartBtn.disabled = true;
+      const originalBtnHtml = shareBtn.innerHTML;
+      shareBtn.innerText = "กำลังบันทึกข้อมูลและส่งผล...";
 
-    // Single Green Action Button: Web Share API with Clipboard Fallback
-    function handleShareResult() {
-      const payload = getSummaryPayload();
+      const evalData = getEvaluationData();
 
-      if (navigator.share) {
-        navigator.share({
-          title: "ผลการประเมิน Food Safety & AD9 Solutions",
-          text: payload
-        }).catch(err => {
-          if (err.name !== 'AbortError') {
-            executeCopy(payload).then(() => showToast());
-          }
-        });
-      } else {
-        executeCopy(payload).then(() => {
-          showToast();
-        }).catch(() => {
-          alert("ไม่สามารถแชร์ได้ กรุณาลองใหม่อีกครั้ง");
-        });
+      try {
+        // 1. บันทึกผลลง Google Sheet (Sheet1) ผ่าน Apps Script
+        await saveResultToSheet(evalData);
+
+        // 2. ส่ง Flex Message เข้าห้องแชต LINE เมื่อเปิดในแอป LINE
+        if (typeof liff !== "undefined" && liff.isInClient()) {
+          await liff.sendMessages([buildFlexMessage(evalData)]);
+          showToast("บันทึกผลและส่ง Flex Message เรียบร้อยแล้ว");
+          setTimeout(() => {
+            liff.closeWindow();
+          }, 600);
+        } else {
+          showToast("บันทึกผลลง Google Sheet แล้ว (เปิดในแอป LINE เพื่อส่ง Flex Message)");
+          shareBtn.disabled = false;
+          restartBtn.disabled = false;
+          shareBtn.innerHTML = originalBtnHtml;
+        }
+      } catch (err) {
+        console.error("Share / Save error:", err);
+        showToast("เกิดข้อผิดพลาดระหว่างส่งข้อมูล กรุณาลองใหม่อีกครั้ง");
+        shareBtn.disabled = false;
+        restartBtn.disabled = false;
+        shareBtn.innerHTML = originalBtnHtml;
       }
     }
 
@@ -790,8 +1006,8 @@
       loadQuestion();
     }
 
-    // Initialize Quiz
-    loadQuestion();
+    // Initialize LIFF & Quiz
+    initializeLiff();
   </script>
 </body>
 </html>
