@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Safety & Sustainability Pre-test</title>
+  <title>Dansai Group • Food Safety & Sustainability</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,6 +13,8 @@
     :root {
       --primary: #0284c7;
       --primary-hover: #0369a1;
+      --green-brand: #15803d;
+      --green-brand-hover: #166534;
       --bg: #f8fafc;
       --card-bg: #ffffff;
       --text-main: #0f172a;
@@ -365,6 +367,100 @@
       color: var(--text-main);
     }
 
+    /* === INFO / REGISTRATION FORM VIEW (?mode=info) === */
+    .info-container {
+      display: none;
+    }
+
+    .greeting-box {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid var(--green-brand);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      font-size: 0.98rem;
+      line-height: 1.65;
+      color: #1e293b;
+    }
+
+    .greeting-box p {
+      margin-bottom: 12px;
+    }
+
+    .greeting-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .greeting-name {
+      font-weight: 700;
+      color: var(--green-brand);
+      font-size: 1.08rem;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .form-label .required {
+      color: #ef4444;
+      margin-left: 2px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1rem;
+      color: var(--text-main);
+      background-color: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--green-brand);
+      box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12);
+    }
+
+    .form-signoff {
+      margin-top: 18px;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #334155;
+    }
+
+    .info-success-box {
+      display: none;
+      text-align: center;
+      padding: 24px 16px;
+    }
+
+    .success-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 9999px;
+      background-color: #dcfce7;
+      color: #15803d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px auto;
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
     .toast {
       visibility: hidden;
       min-width: 290px;
@@ -408,7 +504,7 @@
 
     <div class="user-bar">
       <img id="user-avatar" class="user-avatar" alt="User Avatar">
-      <span>ผู้ทำแบบทดสอบ: <span id="user-name" class="user-name-bold">กำลังโหลดข้อมูล...</span></span>
+      <span>ผู้ใช้งาน: <span id="user-name" class="user-name-bold">กำลังโหลดข้อมูล...</span></span>
     </div>
     
     <!-- Active Quiz View -->
@@ -461,7 +557,6 @@
         </div>
       </div>
 
-      <!-- Single Action Share Button in Green -->
       <div class="action-buttons-container">
         <button id="share-btn" class="btn-action btn-share-green" type="button" onclick="handleShareResult()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -479,9 +574,65 @@
         </button>
       </div>
     </div>
+
+    <!-- Info / Contact Registration View (?mode=info) -->
+    <div id="info-view" class="info-container">
+      <div id="info-form-wrapper">
+        <div class="greeting-box">
+          <p class="greeting-name">สวัสดีค่ะคุณ <span id="greeting-display-name">ผู้เข้าร่วมงาน</span></p>
+          <p>ขอบคุณที่เข้าร่วมงาน <strong>Green Hotel &amp; Sustainable Tourism</strong> ในวันนี้</p>
+          <p>หวังว่าคุณจะได้รับความรู้และสาระประโยชน์กลับไป หากมีข้อสงสัยหรือต้องการคำปรึกษาในเรื่อง Food Safety หรือ Sustainability สามารถติดต่อทาง Dansai Group ได้ทางช่องทางนี้</p>
+          <p>สำหรับท่านที่ได้ทำแบบทดสอบวันนี้ กรุณากรอกรายละเอียดสำหรับการติดต่อกลับด้วยค่ะ</p>
+        </div>
+
+        <form id="contact-info-form" onsubmit="handleInfoSubmit(event)">
+          <div class="form-group">
+            <label class="form-label" for="input-fullname">ชื่อจริง: <span class="required">*</span></label>
+            <input type="text" id="input-fullname" class="form-input" placeholder="กรุณากรอกชื่อ - นามสกุล" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-organization">ชื่อหน่วยงาน: <span class="required">*</span></label>
+            <input type="text" id="input-organization" class="form-input" placeholder="ชื่อโรงแรม / บริษัท / หน่วยงาน" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-phone">หมายเลขโทรศัพท์: <span class="required">*</span></label>
+            <input type="tel" id="input-phone" class="form-input" placeholder="เช่น 081-234-5678" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-email">Email Address: <span class="required">*</span></label>
+            <input type="email" id="input-email" class="form-input" placeholder="example@domain.com" required>
+          </div>
+
+          <div class="form-signoff">
+            <p>ขอบคุณค่ะ</p>
+            <p><strong>Dansai Group</strong></p>
+          </div>
+
+          <button id="submit-info-btn" type="submit" class="btn-action btn-share-green">
+            บันทึกข้อมูลการติดต่อ
+          </button>
+        </form>
+      </div>
+
+      <div id="info-success-box" class="info-success-box">
+        <div class="success-icon">✓</div>
+        <h3 style="font-size: 1.35rem; margin-bottom: 8px; color: #0f172a;">บันทึกข้อมูลเรียบร้อยแล้ว</h3>
+        <p style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 20px;">
+          ขอบคุณค่ะคุณ <span id="success-display-name" style="font-weight: 600;"></span><br>
+          ทางทีมงาน Dansai Group ได้รับข้อมูลสำหรับการติดต่อกลับเรียบร้อยแล้วค่ะ
+        </p>
+        <button type="button" class="btn-action btn-restart" onclick="closeLiffWindow()">
+          ปิดหน้าต่างนี้
+        </button>
+      </div>
+    </div>
+
   </div>
 
-  <div id="toast" class="toast">บันทึกผลและส่งข้อความเข้าแชทเรียบร้อยแล้ว</div>
+  <div id="toast" class="toast">บันทึกข้อมูลเรียบร้อยแล้ว</div>
 
   <script>
     const MY_LIFF_ID = "2011998700-oIjeMpys";
@@ -755,29 +906,44 @@
     };
 
     let urlParams = new URLSearchParams(window.location.search);
+    let modeParam = (urlParams.get("mode") || "quiz").toLowerCase();
     let quizParam = (urlParams.get("quiz") || "ad9").toLowerCase();
     let activeQuiz = quizzes[quizParam] || quizzes.ad9;
     let questions = activeQuiz.questions;
 
-    function applyQuizConfig(paramKey) {
-      quizParam = (paramKey || "ad9").toLowerCase();
+    const quizView = document.getElementById("quiz-view");
+    const resultView = document.getElementById("result-view");
+    const infoView = document.getElementById("info-view");
+
+    function applyRouteView(resolvedMode, resolvedQuiz) {
+      modeParam = (resolvedMode || "quiz").toLowerCase();
+      quizParam = (resolvedQuiz || "ad9").toLowerCase();
       activeQuiz = quizzes[quizParam] || quizzes.ad9;
       questions = activeQuiz.questions;
 
-      document.title = activeQuiz.title;
-      document.getElementById("result-subtitle-text").innerText = activeQuiz.subtitle;
-      document.getElementById("part2-card-title").innerText = activeQuiz.part2CardTitle;
-      document.getElementById("part2-feedback-heading").innerText = activeQuiz.part2HeadingText;
-      document.getElementById("part2-feedback-heading").style.color = activeQuiz.part2HeadingColor;
+      if (modeParam === "info") {
+        quizView.style.display = "none";
+        resultView.style.display = "none";
+        infoView.style.display = "block";
+        document.title = "กรอกข้อมูลการติดต่อกลับ • Dansai Group";
+      } else {
+        infoView.style.display = "none";
+        resultView.style.display = "none";
+        quizView.style.display = "block";
+        document.title = activeQuiz.title;
+        document.getElementById("result-subtitle-text").innerText = activeQuiz.subtitle;
+        document.getElementById("part2-card-title").innerText = activeQuiz.part2CardTitle;
+        document.getElementById("part2-feedback-heading").innerText = activeQuiz.part2HeadingText;
+        document.getElementById("part2-feedback-heading").style.color = activeQuiz.part2HeadingColor;
+        loadQuestion();
+      }
     }
 
     let currentIndex = 0;
     let scorePart1 = 0;
     let scorePart2 = 0;
-    let userProfile = { displayName: "ผู้เข้าร่วมทดสอบ", userId: "" };
+    let userProfile = { displayName: "ผู้เข้าร่วมงาน", userId: "" };
 
-    const quizView = document.getElementById("quiz-view");
-    const resultView = document.getElementById("result-view");
     const partBadge = document.getElementById("part-badge");
     const progressIndicator = document.getElementById("progress-indicator");
     const progressBar = document.getElementById("progress-bar");
@@ -787,37 +953,42 @@
     const nextBtn = document.getElementById("next-btn");
 
     async function initializeLiff() {
-      // Render initial question immediately so the screen never stays blank
-      applyQuizConfig(quizParam);
-      loadQuestion();
+      applyRouteView(modeParam, quizParam);
 
       try {
         if (typeof liff !== "undefined" && MY_LIFF_ID && MY_LIFF_ID !== "YOUR_LIFF_ID_HERE") {
           await liff.init({ liffId: MY_LIFF_ID });
 
           const postInitParams = new URLSearchParams(window.location.search);
+          let resolvedMode = postInitParams.get("mode");
           let resolvedQuiz = postInitParams.get("quiz");
 
-          if (!resolvedQuiz && postInitParams.get("liff.state")) {
+          if ((!resolvedMode || !resolvedQuiz) && postInitParams.get("liff.state")) {
             const stateParams = new URLSearchParams(postInitParams.get("liff.state"));
-            resolvedQuiz = stateParams.get("quiz");
+            resolvedMode = resolvedMode || stateParams.get("mode");
+            resolvedQuiz = resolvedQuiz || stateParams.get("quiz");
           }
 
-          if (resolvedQuiz && resolvedQuiz.toLowerCase() !== quizParam) {
-            applyQuizConfig(resolvedQuiz);
-            loadQuestion();
+          if ((resolvedMode && resolvedMode.toLowerCase() !== modeParam) ||
+              (resolvedQuiz && resolvedQuiz.toLowerCase() !== quizParam)) {
+            applyRouteView(resolvedMode || modeParam, resolvedQuiz || quizParam);
           }
 
           if (!liff.isLoggedIn()) {
             liff.login();
             return;
           }
+
           const profile = await liff.getProfile();
           userProfile = {
-            displayName: profile.displayName || "ผู้เข้าร่วมทดสอบ",
+            displayName: profile.displayName || "ผู้เข้าร่วมงาน",
             userId: profile.userId || ""
           };
+
           document.getElementById("user-name").innerText = userProfile.displayName;
+          document.getElementById("greeting-display-name").innerText = userProfile.displayName;
+          document.getElementById("success-display-name").innerText = userProfile.displayName;
+
           if (profile.pictureUrl) {
             const avatar = document.getElementById("user-avatar");
             avatar.src = profile.pictureUrl;
@@ -825,10 +996,12 @@
           }
         } else {
           document.getElementById("user-name").innerText = userProfile.displayName;
+          document.getElementById("greeting-display-name").innerText = userProfile.displayName;
         }
       } catch (err) {
         console.warn("LIFF init warning:", err);
         document.getElementById("user-name").innerText = userProfile.displayName;
+        document.getElementById("greeting-display-name").innerText = userProfile.displayName;
       }
     }
 
@@ -940,12 +1113,8 @@
     }
 
     async function saveResultToSheet(evalData) {
-      if (!GAS_SHEET_WEBHOOK_URL || GAS_SHEET_WEBHOOK_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
-        console.warn("ยังไม่ได้ตั้งค่า GAS_SHEET_WEBHOOK_URL");
-        return;
-      }
-
       const payload = {
+        action: "saveQuiz",
         sheetTab: activeQuiz.sheetTab,
         quizKey: quizParam,
         displayName: userProfile.displayName,
@@ -1127,6 +1296,62 @@
         shareBtn.disabled = false;
         restartBtn.disabled = false;
         shareBtn.innerHTML = originalBtnHtml;
+      }
+    }
+
+    async function handleInfoSubmit(event) {
+      event.preventDefault();
+      const submitBtn = document.getElementById("submit-info-btn");
+      submitBtn.disabled = true;
+      submitBtn.innerText = "กำลังบันทึกข้อมูล...";
+
+      const fullName = document.getElementById("input-fullname").value.trim();
+      const organization = document.getElementById("input-organization").value.trim();
+      const phone = document.getElementById("input-phone").value.trim();
+      const email = document.getElementById("input-email").value.trim();
+
+      const payload = {
+        action: "updateProfile",
+        sheetTab: "Sheet2",
+        displayName: userProfile.displayName,
+        userId: userProfile.userId,
+        fullName: fullName,
+        organization: organization,
+        phone: phone,
+        email: email
+      };
+
+      try {
+        await fetch(GAS_SHEET_WEBHOOK_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        if (typeof liff !== "undefined" && liff.isInClient()) {
+          await liff.sendMessages([
+            {
+              type: "text",
+              text: `บันทึกข้อมูลการติดต่อกลับเรียบร้อยค่ะ\nชื่อจริง: ${fullName}\nหน่วยงาน: ${organization}\nเบอร์โทร: ${phone}\nEmail: ${email}`
+            }
+          ]);
+        }
+
+        document.getElementById("info-form-wrapper").style.display = "none";
+        document.getElementById("info-success-box").style.display = "block";
+        showToast("บันทึกข้อมูลลง Sheet2 เรียบร้อยแล้ว");
+      } catch (err) {
+        console.error("Info submit error:", err);
+        showToast("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "บันทึกข้อมูลการติดต่อ";
+      }
+    }
+
+    function closeLiffWindow() {
+      if (typeof liff !== "undefined" && liff.isInClient()) {
+        liff.closeWindow();
       }
     }
 
