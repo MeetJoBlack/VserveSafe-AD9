@@ -421,7 +421,7 @@
         <div id="progress-bar" class="progress-bar"></div>
       </div>
 
-      <h2 id="question-text" class="question-title"></h2>
+      <h2 id="question-text" class="question-title">กำลังโหลดคำถาม...</h2>
       <div id="options-container" class="options-grid"></div>
 
       <div id="explanation-container" class="explanation-box"></div>
@@ -484,9 +484,9 @@
   <div id="toast" class="toast">บันทึกผลและส่งข้อความเข้าแชทเรียบร้อยแล้ว</div>
 
   <script>
-    // === 1. REPLACE WITH YOUR ACTUAL LIFF ID AND GOOGLE APPS SCRIPT WEB APP URL ===
+    // === 1. LIFF ID (PRE-FILLED) & GOOGLE APPS SCRIPT WEB APP URL ===
     const MY_LIFF_ID = "2011998700-oIjeMpys";
-    const GAS_SHEET_WEBHOOK_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+    const GAS_SHEET_WEBHOOK_URL = "1d24_joQR1GVohyB5_32WhDD36-PVrn4X60iI48Wn7Rg";
 
     // Part 1: Basic Food Hygiene (Shared by both quizzes)
     const part1Questions = [
@@ -570,7 +570,7 @@
       }
     ];
 
-    // Part 2 (Quiz A): AD9 Solutions (Existing Quiz)
+    // Part 2 (Quiz A): AD9 Solutions (Logs to Sheet1)
     const ad9Part2Questions = [
       {
         part: 2,
@@ -639,7 +639,7 @@
       }
     ];
 
-    // Part 2 (Quiz B): Green Hotel & Sustainability (New Quiz)
+    // Part 2 (Quiz B): Green Hotel & Sustainability (Logs to Sheet2)
     const greenHotelPart2Questions = [
       {
         part: 2,
@@ -708,7 +708,7 @@
       }
     ];
 
-    // Both quizzes configured side-by-side (NO AD9 link button included)
+    // Both quizzes configured side-by-side
     const quizzes = {
       ad9: {
         title: "Food Safety & AD9 Solutions Quiz",
@@ -756,17 +756,22 @@
       }
     };
 
-    // Defaults to 'ad9' if no ?quiz= parameter is passed so existing links stay untouched
-    const urlParams = new URLSearchParams(window.location.search);
-    const quizParam = (urlParams.get("quiz") || "ad9").toLowerCase();
-    const activeQuiz = quizzes[quizParam] || quizzes.ad9;
-    const questions = activeQuiz.questions;
+    let urlParams = new URLSearchParams(window.location.search);
+    let quizParam = (urlParams.get("quiz") || "ad9").toLowerCase();
+    let activeQuiz = quizzes[quizParam] || quizzes.ad9;
+    let questions = activeQuiz.questions;
 
-    document.title = activeQuiz.title;
-    document.getElementById("result-subtitle-text").innerText = activeQuiz.subtitle;
-    document.getElementById("part2-card-title").innerText = activeQuiz.part2CardTitle;
-    document.getElementById("part2-feedback-heading").innerText = activeQuiz.part2HeadingText;
-    document.getElementById("part2-feedback-heading").style.color = activeQuiz.part2HeadingColor;
+    function applyQuizConfig(paramKey) {
+      quizParam = (paramKey || "ad9").toLowerCase();
+      activeQuiz = quizzes[quizParam] || quizzes.ad9;
+      questions = activeQuiz.questions;
+
+      document.title = activeQuiz.title;
+      document.getElementById("result-subtitle-text").innerText = activeQuiz.subtitle;
+      document.getElementById("part2-card-title").innerText = activeQuiz.part2CardTitle;
+      document.getElementById("part2-feedback-heading").innerText = activeQuiz.part2HeadingText;
+      document.getElementById("part2-feedback-heading").style.color = activeQuiz.part2HeadingColor;
+    }
 
     let currentIndex = 0;
     let scorePart1 = 0;
@@ -787,6 +792,19 @@
       try {
         if (MY_LIFF_ID && MY_LIFF_ID !== "YOUR_LIFF_ID_HERE") {
           await liff.init({ liffId: MY_LIFF_ID });
+
+          // Re-read URL parameters AFTER liff.init() restores liff.state
+          const postInitParams = new URLSearchParams(window.location.search);
+          let resolvedQuiz = postInitParams.get("quiz");
+
+          // Fallback: check liff.state directly if still in query string
+          if (!resolvedQuiz && postInitParams.get("liff.state")) {
+            const stateParams = new URLSearchParams(postInitParams.get("liff.state"));
+            resolvedQuiz = stateParams.get("quiz");
+          }
+
+          applyQuizConfig(resolvedQuiz || "ad9");
+
           if (!liff.isLoggedIn()) {
             liff.login();
             return;
@@ -803,10 +821,12 @@
             avatar.style.display = "block";
           }
         } else {
+          applyQuizConfig(quizParam);
           document.getElementById("user-name").innerText = userProfile.displayName;
         }
       } catch (err) {
         console.warn("LIFF init warning:", err);
+        applyQuizConfig(quizParam);
         document.getElementById("user-name").innerText = userProfile.displayName;
       }
       loadQuestion();
@@ -946,180 +966,3 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       });
-    }
-
-    function buildFlexMessage(evalData) {
-      const headerBg = quizParam === "greenhotel" ? "#15803d" : "#0284c7";
-      const headerSubColor = quizParam === "greenhotel" ? "#bbf7d0" : "#bae6fd";
-      const part2TitleColor = quizParam === "greenhotel" ? "#15803d" : "#b45309";
-
-      return {
-        type: "flex",
-        altText: `สรุปผล Pre-test (${activeQuiz.title}): ${evalData.totalScore}/${evalData.totalQuestions} คะแนน (${evalData.percentTotal}%)`,
-        contents: {
-          type: "bubble",
-          size: "mega",
-          header: {
-            type: "box",
-            layout: "vertical",
-            backgroundColor: headerBg,
-            paddingAll: "16px",
-            contents: [
-              {
-                type: "text",
-                text: activeQuiz.flexHeaderSubtitle,
-                color: headerSubColor,
-                size: "xs",
-                weight: "bold"
-              },
-              {
-                type: "text",
-                text: "สรุปผลการประเมิน Pre-test",
-                color: "#ffffff",
-                size: "lg",
-                weight: "bold",
-                margin: "xs"
-              },
-              {
-                type: "text",
-                text: `ผู้ทำแบบทดสอบ: ${userProfile.displayName}`,
-                color: "#f8fafc",
-                size: "xs",
-                margin: "xs"
-              }
-            ]
-          },
-          body: {
-            type: "box",
-            layout: "vertical",
-            spacing: "md",
-            paddingAll: "16px",
-            contents: [
-              {
-                type: "box",
-                layout: "baseline",
-                contents: [
-                  {
-                    type: "text",
-                    text: `${evalData.totalScore}/${evalData.totalQuestions}`,
-                    size: "xxl",
-                    weight: "bold",
-                    color: headerBg,
-                    flex: 0
-                  },
-                  {
-                    type: "text",
-                    text: ` คะแนน (${evalData.percentTotal}%)`,
-                    size: "sm",
-                    color: "#475569",
-                    margin: "sm"
-                  }
-                ]
-              },
-              { type: "separator" },
-              {
-                type: "box",
-                layout: "vertical",
-                spacing: "xs",
-                contents: [
-                  {
-                    type: "text",
-                    text: `• ส่วนที่ 1 (Basic Hygiene): ${scorePart1}/6`,
-                    size: "sm",
-                    weight: "bold",
-                    color: "#0f172a"
-                  },
-                  {
-                    type: "text",
-                    text: evalData.p1Feedback,
-                    size: "xs",
-                    color: "#475569",
-                    wrap: true
-                  },
-                  {
-                    type: "text",
-                    text: `• ${activeQuiz.part2CardTitle}: ${scorePart2}/5`,
-                    size: "sm",
-                    weight: "bold",
-                    color: part2TitleColor,
-                    margin: "sm"
-                  },
-                  {
-                    type: "text",
-                    text: evalData.p2Feedback,
-                    size: "xs",
-                    color: "#475569",
-                    wrap: true
-                  }
-                ]
-              },
-              { type: "separator" },
-              {
-                type: "text",
-                text: activeQuiz.flexFooterText,
-                size: "xs",
-                color: "#64748b",
-                wrap: true
-              }
-            ]
-          }
-        }
-      };
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById("toast");
-      if (msg) toast.innerText = msg;
-      toast.classList.add("show");
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3500);
-    }
-
-    async function handleShareResult() {
-      const shareBtn = document.getElementById("share-btn");
-      const restartBtn = document.getElementById("restart-btn");
-      shareBtn.disabled = true;
-      restartBtn.disabled = true;
-      const originalBtnHtml = shareBtn.innerHTML;
-      shareBtn.innerText = "กำลังบันทึกข้อมูลและส่งผล...";
-
-      const evalData = getEvaluationData();
-
-      try {
-        await saveResultToSheet(evalData);
-
-        if (typeof liff !== "undefined" && liff.isInClient()) {
-          await liff.sendMessages([buildFlexMessage(evalData)]);
-          showToast("บันทึกผลและส่ง Flex Message เรียบร้อยแล้ว");
-          setTimeout(() => {
-            liff.closeWindow();
-          }, 600);
-        } else {
-          showToast("บันทึกผลลง Google Sheet แล้ว (เปิดในแอป LINE เพื่อส่ง Flex Message)");
-          shareBtn.disabled = false;
-          restartBtn.disabled = false;
-          shareBtn.innerHTML = originalBtnHtml;
-        }
-      } catch (err) {
-        console.error("Share / Save error:", err);
-        showToast("เกิดข้อผิดพลาดระหว่างส่งข้อมูล กรุณาลองใหม่อีกครั้ง");
-        shareBtn.disabled = false;
-        restartBtn.disabled = false;
-        shareBtn.innerHTML = originalBtnHtml;
-      }
-    }
-
-    function restartQuiz() {
-      currentIndex = 0;
-      scorePart1 = 0;
-      scorePart2 = 0;
-      resultView.style.display = "none";
-      quizView.style.display = "block";
-      loadQuestion();
-    }
-
-    initializeLiff();
-  </script>
-</body>
-</html>
