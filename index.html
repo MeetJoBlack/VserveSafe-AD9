@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Safety & AD9 Solutions Quiz</title>
+  <title>Food Safety & Sustainability Pre-test</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -104,6 +104,11 @@
     .badge.part2 {
       background-color: #fef3c7;
       color: #b45309;
+    }
+
+    .badge.part2-green {
+      background-color: #dcfce7;
+      color: #15803d;
     }
 
     .progress-text {
@@ -339,7 +344,6 @@
       cursor: not-allowed;
     }
 
-    /* Single Green Action Button */
     .btn-share-green {
       background-color: var(--action-green);
       color: #ffffff;
@@ -361,7 +365,6 @@
       color: var(--text-main);
     }
 
-    /* Toast Notification */
     .toast {
       visibility: hidden;
       min-width: 290px;
@@ -428,18 +431,18 @@
     <!-- Final Result View -->
     <div id="result-view" class="result-container">
       <h2 class="result-title">สรุปผลการประเมิน Pre-test</h2>
-      <p class="result-subtitle">แบบทดสอบสุขอนามัยอาหารและโซลูชัน AD9 (Dansai Group)</p>
+      <p class="result-subtitle" id="result-subtitle-text">แบบทดสอบสุขอนามัยอาหาร (Dansai Group)</p>
       
       <div class="total-score" id="total-score-text">คะแนนรวม: 0 จาก 11 คะแนน (0%)</div>
 
       <div class="score-summary-grid">
         <div class="score-card">
-          <h3>ส่วนที่ 1: Basic Food Hygiene</h3>
+          <h3 id="part1-card-title">ส่วนที่ 1: Basic Food Hygiene</h3>
           <div class="score" id="part1-score-text">0 / 6</div>
           <p id="part1-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;"></p>
         </div>
         <div class="score-card">
-          <h3>ส่วนที่ 2: AD9 Solutions</h3>
+          <h3 id="part2-card-title">ส่วนที่ 2: AD9 Solutions</h3>
           <div class="score" id="part2-score-text">0 / 5</div>
           <p id="part2-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;"></p>
         </div>
@@ -453,7 +456,7 @@
           <p id="part1-feedback-text"></p>
         </div>
         <div class="analysis-part" style="margin-top: 14px;">
-          <h4 style="color: #b45309;">📌 สรุปผลส่วนที่ 2: ระบบ AD9 Solutions & นวัตกรรมอาหาร</h4>
+          <h4 id="part2-feedback-heading" style="color: #b45309;">📌 สรุปผลส่วนที่ 2: ระบบ AD9 Solutions & นวัตกรรมอาหาร</h4>
           <p id="part2-feedback-text"></p>
         </div>
       </div>
@@ -468,7 +471,7 @@
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
-          ส่ง Flex Message & บันทึกผล
+          ส่งผลลัพธ์เข้าแชท & บันทึกผล
         </button>
 
         <button id="restart-btn" class="btn-action btn-restart" type="button" onclick="restartQuiz()">
@@ -478,15 +481,15 @@
     </div>
   </div>
 
-  <div id="toast" class="toast">บันทึกผลและส่ง Flex Message เรียบร้อยแล้ว</div>
+  <div id="toast" class="toast">บันทึกผลและส่งข้อความเข้าแชทเรียบร้อยแล้ว</div>
 
   <script>
-    // === ตั้งค่า LIFF ID และ Google Apps Script Web App URL ===
-    const MY_LIFF_ID = "2011998700-oIjeMpys";
-    const GAS_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwX9PORreLCU2V0tJnb1CHvp6YxLUzQLrJsQM2Z1NkQIy8tRPa73jePydk4LtaTA9Fr/exec";
+    // === 1. REPLACE WITH YOUR ACTUAL LIFF ID AND GOOGLE APPS SCRIPT WEB APP URL ===
+    const MY_LIFF_ID = "YOUR_LIFF_ID_HERE";
+    const GAS_SHEET_WEBHOOK_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 
-    const questions = [
-      // Part 1: Basic Food Hygiene (1 to 6)
+    // Part 1: Basic Food Hygiene (Shared by both quizzes)
+    const part1Questions = [
       {
         part: 1,
         partLabel: "ส่วนที่ 1: Basic Food Hygiene",
@@ -564,9 +567,11 @@
         ],
         correct: 2,
         explanation: "การล้างมือที่ถูกต้องต้องฟอกสบู่ให้ทั่วฝ่ามือ ซอกนิ้ว ข้อมือ และใต้เล็บเป็นเวลาอย่างน้อย 20 วินาที แล้วเช็ดให้แห้งด้วยกระดาษชำระแบบใช้ครั้งเดียวทิ้ง"
-      },
+      }
+    ];
 
-      // Part 2: AD9 Solutions (7 to 11)
+    // Part 2 (Quiz A): AD9 Solutions (Existing Quiz)
+    const ad9Part2Questions = [
       {
         part: 2,
         partLabel: "ส่วนที่ 2: AD9 Solutions",
@@ -634,6 +639,135 @@
       }
     ];
 
+    // Part 2 (Quiz B): Green Hotel & Sustainability (New Quiz)
+    const greenHotelPart2Questions = [
+      {
+        part: 2,
+        partLabel: "ส่วนที่ 2: Green Hotel & Sustainability",
+        question: "7. แนวคิดหลักของการบริหารจัดการตามมาตรฐาน 'Green Hotel' (โรงแรมที่เป็นมิตรกับสิ่งแวดล้อม) มุ่งเน้นเรื่องใดเป็นสำคัญ?",
+        options: [
+          "การใช้ทรัพยากรและพลังงานอย่างคุ้มค่า ลดมลพิษและของเสีย ควบคู่กับการมีส่วนร่วมของพนักงานและชุมชน",
+          "การงดใช้เครื่องปรับอากาศและไฟฟ้าในทุกพื้นที่ของโรงแรมตลอดทั้งวัน",
+          "การขึ้นราคาห้องพักให้สูงขึ้นเพื่อนำไปชดเชยค่าใช้จ่ายด้านการตกแต่ง",
+          "การเปลี่ยนพื้นที่สีเขียวทั้งหมดให้เป็นลานจอดรถเพื่อรองรับนักท่องเที่ยว"
+        ],
+        correct: 0,
+        explanation: "Green Hotel คือการดำเนินธุรกิจโรงแรมที่เป็นมิตรต่อสิ่งแวดล้อม เน้นการอนุรักษ์พลังงาน น้ำ การจัดการขยะอย่างเป็นระบบ และการสร้างจิตสำนึกร่วมกันระหว่างพนักงาน ผู้เข้าพัก และชุมชน"
+      },
+      {
+        part: 2,
+        partLabel: "ส่วนที่ 2: Green Hotel & Sustainability",
+        question: "8. ในการดำเนินงานครัวและห้องอาหารของโรงแรม แนวทางใดช่วยลด 'ขยะอาหาร (Food Waste)' ได้อย่างมีประสิทธิภาพและยั่งยืนที่สุด?",
+        options: [
+          "สั่งซื้อวัตถุดิบคราวละมากๆ เก็บไว้ในสต็อกเผื่อขาดแคลน",
+          "การวางแผนปริมาณการผลิตให้สอดคล้องกับยอดเข้าพัก ใช้ระบบ FIFO และนำเศษอาหารอินทรีย์ไปแปรรูปเป็นปุ๋ยหรือก๊าซชีวภาพ",
+          "เทเศษอาหารทั้งหมดรวมกับขยะพลาสติกเพื่อความรวดเร็วในการเก็บกวาด",
+          "นำอาหารจากไลน์บุฟเฟต์ที่วางเกิน 4 ชั่วโมงกลับมาอุ่นเสิร์ฟใหม่ในวันถัดไป"
+        ],
+        correct: 1,
+        explanation: "การจัดการ Food Waste ต้องเริ่มตั้งแต่ต้นน้ำ (วางแผนสั่งซื้อและปรุงพอดีคำ/FIFO) จนถึงปลายน้ำ (แยกขยะอินทรีย์ไปทำปุ๋ยหมัก) โดยยังคงยึดหลัก Food Safety อย่างเคร่งครัด ไม่นำอาหารเสี่ยงกลับมาเสิร์ฟซ้ำ"
+      },
+      {
+        part: 2,
+        partLabel: "ส่วนที่ 2: Green Hotel & Sustainability",
+        question: "9. การจัดการ 'น้ำมันพืชใช้แล้ว (Used Cooking Oil)' และ 'ไขมันจากบ่อดักไขมัน' ในโรงแรมตามแนวทางความยั่งยืนและเป็นมิตรต่อสิ่งแวดล้อมควรทำอย่างไร?",
+        options: [
+          "เทลงท่อระบายน้ำโดยตรงพร้อมเปิดน้ำร้อนตามมากๆ",
+          "บรรจุใส่ถุงดำแล้วนำไปทิ้งรวมกับขยะทั่วไป",
+          "รวบรวมน้ำมันใช้แล้วส่งต่อให้ผู้รับซื้อที่ได้รับอนุญาตเพื่อนำไปผลิตเชื้อเพลิงชีวภาพ (SAF / Biodiesel) และดูแลบ่อดักไขมันสม่ำเสมอ",
+          "นำน้ำมันที่ทอดซ้ำจนดำคล้ำกลับมาใช้ปรุงอาหารต่อจนหมดหยดสุดท้าย"
+        ],
+        correct: 2,
+        explanation: "น้ำมันใช้แล้วไม่ควรทิ้งลงท่อเพราะทำให้ท่ออุดตันและทำลายแหล่งน้ำ แต่สามารถนำไปต่อยอดเป็นเชื้อเพลิงชีวภาพ (Bio-jet / Biodiesel) สร้างเศรษฐกิจหมุนเวียน (Circular Economy) และปลอดภัยต่อผู้บริโภค"
+      },
+      {
+        part: 2,
+        partLabel: "ส่วนที่ 2: Green Hotel & Sustainability",
+        question: "10. มาตรการลดการใช้พลาสติกแบบใช้ครั้งเดียวทิ้ง (Single-Use Plastics) ในธุรกิจโรงแรมและบริการที่เหมาะสมและได้มาตรฐานคือข้อใด?",
+        options: [
+          "ยกเลิกการทำความสะอาดห้องพักทั้งหมดเพื่อลดการใช้น้ำยา",
+          "เปลี่ยนมาใช้ขวดแก้วแบบเติม (Refillable Glass Bottles) สำหรับน้ำดื่ม และใช้ขวดกดขนาดใหญ่ (Pump Dispenser) สำหรับสบู่แชมพูในห้องพัก",
+          "ใช้ถุงพลาสติกห่อหุ้มวัตถุดิบทุกชิ้นซ้อนกันหลายชั้นแทนการใช้กล่องถนอมอาหาร",
+          "แจกหลอดพลาสติกและช้อนส้อมพลาสติกให้แขกทุกคนโดยอัตโนมัติแม้ไม่ได้ร้องขอ"
+        ],
+        correct: 1,
+        explanation: "การเปลี่ยนจากขวดพลาสติกเล็กเป็นขวดแก้ว Refill และเปลี่ยนขวดแชมพูขนาดจิ๋วเป็น Dispenser ช่วยลดปริมาณขยะพลาสติกได้มหาศาลในแต่ละปี"
+      },
+      {
+        part: 2,
+        partLabel: "ส่วนที่ 2: Green Hotel & Sustainability",
+        question: "11. การผสานมาตรฐาน 'Food Safety' เข้ากับ 'Sustainability (ความยั่งยืน)' ในธุรกิจท่องเที่ยวและโรงแรม ส่งผลดีต่อองค์กรในระยะยาวอย่างไร?",
+        options: [
+          "ช่วยลดต้นทุนการสูญเสียวัตถุดิบ ลดความเสี่ยงด้านสุขอนามัย และสร้างความเชื่อมั่นให้แก่นักท่องเที่ยวยุคใหม่ที่ใส่ใจสิ่งแวดล้อม",
+          "ทำให้โรงแรมไม่ต้องขอใบอนุญาตประกอบกิจการหรือรับการตรวจประเมินอีกต่อไป",
+          "ช่วยลดจำนวนพนักงานในครัวได้ทันทีโดยไม่ต้องวางระบบการทำงาน",
+          "เป็นเพียงการจัดกิจกรรมประชาสัมพันธ์ชั่วคราวโดยไม่มีผลต่อมาตรฐานการบริการ"
+        ],
+        correct: 0,
+        explanation: "Food Safety และ Sustainability เสริมกันโดยตรง เพราะการจัดการวัตถุดิบและอุณหภูมิที่ดีช่วยลดของเสีย (Food Waste) ลดต้นทุน และตอบโจทย์มาตรฐานการท่องเที่ยวยั่งยืนระดับสากล"
+      }
+    ];
+
+    // Both quizzes configured side-by-side (NO AD9 link button included)
+    const quizzes = {
+      ad9: {
+        title: "Food Safety & AD9 Solutions Quiz",
+        subtitle: "แบบทดสอบสุขอนามัยอาหารและโซลูชัน AD9 (Dansai Group)",
+        sheetTab: "Sheet1",
+        part2CardTitle: "ส่วนที่ 2: AD9 Solutions",
+        part2DescSuffix: "(ระบบ AD9 Solutions)",
+        part2BadgeClass: "part2",
+        part2HeadingText: "📌 สรุปผลส่วนที่ 2: ระบบ AD9 Solutions & นวัตกรรมอาหาร",
+        part2HeadingColor: "#b45309",
+        flexHeaderSubtitle: "DANSAI GROUP • AD9 SOLUTIONS",
+        flexFooterText: "ปรึกษาการยกระดับมาตรฐานความปลอดภัยอาหาร & โซลูชัน AD9 ได้ที่ Dansai Group (www.dansai.co.th)",
+        questions: [...part1Questions, ...ad9Part2Questions],
+        getPart2Feedback: (score) => {
+          if (score === 5) {
+            return "ระดับยอดเยี่ยม! คุณเห็นภาพประโยชน์ของนวัตกรรมดิจิทัลเพื่อความปลอดภัยอาหารอย่างชัดเจน หากต้องการต่อยอดวางระบบ AD9 หรือ Real-time Monitoring เพื่อเตรียมพร้อมรับรองมาตรฐาน SAN / SAN+ ทีมงาน Dansai Group ยินดีให้คำปรึกษาและออกแบบระบบร่วมกับคุณครับ";
+          } else if (score >= 3) {
+            return "ระดับดี! คุณเข้าใจแนวคิดหลักในการใช้นวัตกรรมสกัดความเสี่ยงอาหารได้เป็นอย่างดี สำหรับการใช้แดชบอร์ดจริงเพื่อลดต้นทุนแฝง ทีม Dansai Group พร้อมให้คำแนะนำและพาทดลองใช้เครื่องมือเพิ่มเติมเพื่อยกระดับครัวสู่มาตรฐานสากลครับ";
+          } else {
+            return "เริ่มต้นได้ดี! เทคโนโลยีด้านความปลอดภัยอาหารยุคใหม่ยังมีรายละเอียดที่น่าสนใจอีกมาก หากต้องการปูพื้นฐานแนวคิด หรือเตรียมรับมาตรฐาน SAN / SAN+ ให้ผ่านฉลุย สามารถปรึกษาและขอรับบริการตรวจประเมินเบื้องต้นกับทีมผู้เชี่ยวชาญ Dansai Group ได้เลยครับ";
+          }
+        }
+      },
+      greenhotel: {
+        title: "Food Safety & Green Hotel Sustainability Quiz",
+        subtitle: "แบบทดสอบสุขอนามัยอาหารและมาตรฐาน Green Hotel & ความยั่งยืน",
+        sheetTab: "Sheet2",
+        part2CardTitle: "ส่วนที่ 2: Green Hotel & Sustainability",
+        part2DescSuffix: "(Green Hotel & ความยั่งยืน)",
+        part2BadgeClass: "part2-green",
+        part2HeadingText: "📌 สรุปผลส่วนที่ 2: Green Hotel & ความยั่งยืน",
+        part2HeadingColor: "#15803d",
+        flexHeaderSubtitle: "DANSAI GROUP • GREEN HOTEL & SUSTAINABILITY",
+        flexFooterText: "ยกระดับมาตรฐานสุขอนามัยอาหารและความยั่งยืนในธุรกิจโรงแรมและบริการ ได้ที่ Dansai Group (www.dansai.co.th)",
+        questions: [...part1Questions, ...greenHotelPart2Questions],
+        getPart2Feedback: (score) => {
+          if (score === 5) {
+            return "ระดับยอดเยี่ยม! คุณมีความเข้าใจเรื่องการจัดการสิ่งแวดล้อมในโรงแรม การลดขยะอาหาร (Food Waste) และการเชื่อมโยง Food Safety เข้ากับความยั่งยืนได้อย่างครบถ้วน พร้อมเป็นกำลังสำคัญในการขับเคลื่อน Green Hotel ครับ";
+          } else if (score >= 3) {
+            return "ระดับดี! คุณเข้าใจแนวทางหลักของโรงแรมที่เป็นมิตรต่อสิ่งแวดล้อมและการจัดการของเสียได้ดี การต่อยอดเรื่องการคัดแยกขยะอินทรีย์และน้ำมันใช้แล้วจะช่วยยกระดับมาตรฐานความยั่งยืนขององค์กรได้ดียิ่งขึ้นครับ";
+          } else {
+            return "เริ่มต้นได้ดี! การผสานมาตรฐานสุขอนามัยอาหารเข้ากับการลด Food Waste และแนวทาง Green Hotel เป็นหัวใจสำคัญของการบริการยุคใหม่ สามารถเรียนรู้และขอคำแนะนำเพิ่มเติมได้จากทีมผู้เชี่ยวชาญ Dansai Group ครับ";
+          }
+        }
+      }
+    };
+
+    // Defaults to 'ad9' if no ?quiz= parameter is passed so existing links stay untouched
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizParam = (urlParams.get("quiz") || "ad9").toLowerCase();
+    const activeQuiz = quizzes[quizParam] || quizzes.ad9;
+    const questions = activeQuiz.questions;
+
+    document.title = activeQuiz.title;
+    document.getElementById("result-subtitle-text").innerText = activeQuiz.subtitle;
+    document.getElementById("part2-card-title").innerText = activeQuiz.part2CardTitle;
+    document.getElementById("part2-feedback-heading").innerText = activeQuiz.part2HeadingText;
+    document.getElementById("part2-feedback-heading").style.color = activeQuiz.part2HeadingColor;
+
     let currentIndex = 0;
     let scorePart1 = 0;
     let scorePart2 = 0;
@@ -686,10 +820,9 @@
       const q = questions[currentIndex];
 
       partBadge.innerText = q.partLabel;
+      partBadge.classList.remove("part2", "part2-green");
       if (q.part === 2) {
-        partBadge.classList.add("part2");
-      } else {
-        partBadge.classList.remove("part2");
+        partBadge.classList.add(activeQuiz.part2BadgeClass);
       }
 
       progressIndicator.innerText = `ข้อ ${currentIndex + 1}/${questions.length}`;
@@ -760,14 +893,7 @@
         p1Feedback = "จุดเริ่มต้นที่ดี! การเข้าร่วมกิจกรรมในวันนี้จะช่วยอุดรอยต่อเรื่องช่วงอุณหภูมิอันตราย (TDZ) และการสกัดการปนเปื้อนข้ามได้อย่างสมบูรณ์";
       }
 
-      let p2Feedback = "";
-      if (scorePart2 === 5) {
-        p2Feedback = "ระดับยอดเยี่ยม! คุณเห็นภาพประโยชน์ของนวัตกรรมดิจิทัลเพื่อความปลอดภัยอาหารอย่างชัดเจน หากต้องการต่อยอดวางระบบ AD9 หรือ Real-time Monitoring เพื่อเตรียมพร้อมรับรองมาตรฐาน SAN / SAN+ ทีมงาน Dansai Group ยินดีให้คำปรึกษาและออกแบบระบบร่วมกับคุณครับ";
-      } else if (scorePart2 >= 3) {
-        p2Feedback = "ระดับดี! คุณเข้าใจแนวคิดหลักในการใช้นวัตกรรมสกัดความเสี่ยงอาหารได้เป็นอย่างดี สำหรับการใช้แดชบอร์ดจริงเพื่อลดต้นทุนแฝง ทีม Dansai Group พร้อมให้คำแนะนำและพาทดลองใช้เครื่องมือเพิ่มเติมเพื่อยกระดับครัวสู่มาตรฐานสากลครับ";
-      } else {
-        p2Feedback = "เริ่มต้นได้ดี! เทคโนโลยีด้านความปลอดภัยอาหารยุคใหม่ยังมีรายละเอียดที่น่าสนใจอีกมาก หากต้องการปูพื้นฐานแนวคิด หรือเตรียมรับมาตรฐาน SAN / SAN+ ให้ผ่านฉลุย สามารถปรึกษาและขอรับบริการตรวจประเมินเบื้องต้นกับทีมผู้เชี่ยวชาญ Dansai Group ได้เลยค่ะ";
-      }
+      const p2Feedback = activeQuiz.getPart2Feedback(scorePart2);
 
       return { totalScore, totalQuestions, percentTotal, p1Feedback, p2Feedback };
     }
@@ -787,7 +913,7 @@
 
       document.getElementById("part2-score-text").innerText = `${scorePart2} / 5`;
       document.getElementById("part2-desc").innerText =
-        `คิดเป็น ${Math.round((scorePart2 / 5) * 100)}% (ระบบ AD9 Solutions)`;
+        `คิดเป็น ${Math.round((scorePart2 / 5) * 100)}% ${activeQuiz.part2DescSuffix}`;
 
       document.getElementById("part1-feedback-text").innerText = evalData.p1Feedback;
       document.getElementById("part2-feedback-text").innerText = evalData.p2Feedback;
@@ -800,6 +926,8 @@
       }
 
       const payload = {
+        sheetTab: activeQuiz.sheetTab,
+        quizKey: quizParam,
         displayName: userProfile.displayName,
         userId: userProfile.userId,
         totalScore: evalData.totalScore,
@@ -808,7 +936,8 @@
         scorePart1: scorePart1,
         scorePart2: scorePart2,
         part1Feedback: evalData.p1Feedback,
-        part2Feedback: evalData.p2Feedback
+        part2Feedback: evalData.p2Feedback,
+        clientType: typeof liff !== "undefined" && liff.isInClient() ? "LINE_LIFF" : "WEB_BROWSER"
       };
 
       await fetch(GAS_SHEET_WEBHOOK_URL, {
@@ -820,22 +949,26 @@
     }
 
     function buildFlexMessage(evalData) {
+      const headerBg = quizParam === "greenhotel" ? "#15803d" : "#0284c7";
+      const headerSubColor = quizParam === "greenhotel" ? "#bbf7d0" : "#bae6fd";
+      const part2TitleColor = quizParam === "greenhotel" ? "#15803d" : "#b45309";
+
       return {
         type: "flex",
-        altText: `สรุปผล Pre-test Food Safety & AD9: ${evalData.totalScore}/${evalData.totalQuestions} คะแนน (${evalData.percentTotal}%)`,
+        altText: `สรุปผล Pre-test (${activeQuiz.title}): ${evalData.totalScore}/${evalData.totalQuestions} คะแนน (${evalData.percentTotal}%)`,
         contents: {
           type: "bubble",
           size: "mega",
           header: {
             type: "box",
             layout: "vertical",
-            backgroundColor: "#0284c7",
+            backgroundColor: headerBg,
             paddingAll: "16px",
             contents: [
               {
                 type: "text",
-                text: "DANSAI GROUP • AD9 SOLUTIONS",
-                color: "#bae6fd",
+                text: activeQuiz.flexHeaderSubtitle,
+                color: headerSubColor,
                 size: "xs",
                 weight: "bold"
               },
@@ -850,7 +983,7 @@
               {
                 type: "text",
                 text: `ผู้ทำแบบทดสอบ: ${userProfile.displayName}`,
-                color: "#e0f2fe",
+                color: "#f8fafc",
                 size: "xs",
                 margin: "xs"
               }
@@ -871,7 +1004,7 @@
                     text: `${evalData.totalScore}/${evalData.totalQuestions}`,
                     size: "xxl",
                     weight: "bold",
-                    color: "#0284c7",
+                    color: headerBg,
                     flex: 0
                   },
                   {
@@ -905,10 +1038,10 @@
                   },
                   {
                     type: "text",
-                    text: `• ส่วนที่ 2 (AD9 Solutions): ${scorePart2}/5`,
+                    text: `• ${activeQuiz.part2CardTitle}: ${scorePart2}/5`,
                     size: "sm",
                     weight: "bold",
-                    color: "#b45309",
+                    color: part2TitleColor,
                     margin: "sm"
                   },
                   {
@@ -923,28 +1056,10 @@
               { type: "separator" },
               {
                 type: "text",
-                text: "ปรึกษาการยกระดับมาตรฐานความปลอดภัยอาหาร & โซลูชัน AD9 ได้ที่ Dansai Group (www.dansai.co.th)",
+                text: activeQuiz.flexFooterText,
                 size: "xs",
                 color: "#64748b",
                 wrap: true
-              }
-            ]
-          },
-          footer: {
-            type: "box",
-            layout: "vertical",
-            paddingAll: "12px",
-            contents: [
-              {
-                type: "button",
-                style: "primary",
-                color: "#06c755",
-                height: "sm",
-                action: {
-                  type: "uri",
-                  label: "ดูข้อมูล AD9 Solutions",
-                  uri: "https://www.dansai.co.th/?page_id=249"
-                }
               }
             ]
           }
@@ -972,10 +1087,8 @@
       const evalData = getEvaluationData();
 
       try {
-        // 1. บันทึกผลลง Google Sheet (Sheet1) ผ่าน Apps Script
         await saveResultToSheet(evalData);
 
-        // 2. ส่ง Flex Message เข้าห้องแชต LINE เมื่อเปิดในแอป LINE
         if (typeof liff !== "undefined" && liff.isInClient()) {
           await liff.sendMessages([buildFlexMessage(evalData)]);
           showToast("บันทึกผลและส่ง Flex Message เรียบร้อยแล้ว");
@@ -1006,7 +1119,6 @@
       loadQuestion();
     }
 
-    // Initialize LIFF & Quiz
     initializeLiff();
   </script>
 </body>
