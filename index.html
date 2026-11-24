@@ -484,7 +484,6 @@
   <div id="toast" class="toast">บันทึกผลและส่งข้อความเข้าแชทเรียบร้อยแล้ว</div>
 
   <script>
-    // === 1. LIFF ID (PRE-FILLED) & GOOGLE APPS SCRIPT WEB APP URL ===
     const MY_LIFF_ID = "2011998700-oIjeMpys";
     const GAS_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwX9PORreLCU2V0tJnb1CHvp6YxLUzQLrJsQM2Z1NkQIy8tRPa73jePydk4LtaTA9Fr/exec";
 
@@ -708,7 +707,6 @@
       }
     ];
 
-    // Both quizzes configured side-by-side
     const quizzes = {
       ad9: {
         title: "Food Safety & AD9 Solutions Quiz",
@@ -789,21 +787,26 @@
     const nextBtn = document.getElementById("next-btn");
 
     async function initializeLiff() {
+      // Render initial question immediately so the screen never stays blank
+      applyQuizConfig(quizParam);
+      loadQuestion();
+
       try {
-        if (MY_LIFF_ID && MY_LIFF_ID !== "YOUR_LIFF_ID_HERE") {
+        if (typeof liff !== "undefined" && MY_LIFF_ID && MY_LIFF_ID !== "YOUR_LIFF_ID_HERE") {
           await liff.init({ liffId: MY_LIFF_ID });
 
-          // Re-read URL parameters AFTER liff.init() restores liff.state
           const postInitParams = new URLSearchParams(window.location.search);
           let resolvedQuiz = postInitParams.get("quiz");
 
-          // Fallback: check liff.state directly if still in query string
           if (!resolvedQuiz && postInitParams.get("liff.state")) {
             const stateParams = new URLSearchParams(postInitParams.get("liff.state"));
             resolvedQuiz = stateParams.get("quiz");
           }
 
-          applyQuizConfig(resolvedQuiz || "ad9");
+          if (resolvedQuiz && resolvedQuiz.toLowerCase() !== quizParam) {
+            applyQuizConfig(resolvedQuiz);
+            loadQuestion();
+          }
 
           if (!liff.isLoggedIn()) {
             liff.login();
@@ -821,15 +824,12 @@
             avatar.style.display = "block";
           }
         } else {
-          applyQuizConfig(quizParam);
           document.getElementById("user-name").innerText = userProfile.displayName;
         }
       } catch (err) {
         console.warn("LIFF init warning:", err);
-        applyQuizConfig(quizParam);
         document.getElementById("user-name").innerText = userProfile.displayName;
       }
-      loadQuestion();
     }
 
     function loadQuestion() {
@@ -966,3 +966,180 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       });
+    }
+
+    function buildFlexMessage(evalData) {
+      const headerBg = quizParam === "greenhotel" ? "#15803d" : "#0284c7";
+      const headerSubColor = quizParam === "greenhotel" ? "#bbf7d0" : "#bae6fd";
+      const part2TitleColor = quizParam === "greenhotel" ? "#15803d" : "#b45309";
+
+      return {
+        type: "flex",
+        altText: `สรุปผล Pre-test (${activeQuiz.title}): ${evalData.totalScore}/${evalData.totalQuestions} คะแนน (${evalData.percentTotal}%)`,
+        contents: {
+          type: "bubble",
+          size: "mega",
+          header: {
+            type: "box",
+            layout: "vertical",
+            backgroundColor: headerBg,
+            paddingAll: "16px",
+            contents: [
+              {
+                type: "text",
+                text: activeQuiz.flexHeaderSubtitle,
+                color: headerSubColor,
+                size: "xs",
+                weight: "bold"
+              },
+              {
+                type: "text",
+                text: "สรุปผลการประเมิน Pre-test",
+                color: "#ffffff",
+                size: "lg",
+                weight: "bold",
+                margin: "xs"
+              },
+              {
+                type: "text",
+                text: `ผู้ทำแบบทดสอบ: ${userProfile.displayName}`,
+                color: "#f8fafc",
+                size: "xs",
+                margin: "xs"
+              }
+            ]
+          },
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "md",
+            paddingAll: "16px",
+            contents: [
+              {
+                type: "box",
+                layout: "baseline",
+                contents: [
+                  {
+                    type: "text",
+                    text: `${evalData.totalScore}/${evalData.totalQuestions}`,
+                    size: "xxl",
+                    weight: "bold",
+                    color: headerBg,
+                    flex: 0
+                  },
+                  {
+                    type: "text",
+                    text: ` คะแนน (${evalData.percentTotal}%)`,
+                    size: "sm",
+                    color: "#475569",
+                    margin: "sm"
+                  }
+                ]
+              },
+              { type: "separator" },
+              {
+                type: "box",
+                layout: "vertical",
+                spacing: "xs",
+                contents: [
+                  {
+                    type: "text",
+                    text: `• ส่วนที่ 1 (Basic Hygiene): ${scorePart1}/6`,
+                    size: "sm",
+                    weight: "bold",
+                    color: "#0f172a"
+                  },
+                  {
+                    type: "text",
+                    text: evalData.p1Feedback,
+                    size: "xs",
+                    color: "#475569",
+                    wrap: true
+                  },
+                  {
+                    type: "text",
+                    text: `• ${activeQuiz.part2CardTitle}: ${scorePart2}/5`,
+                    size: "sm",
+                    weight: "bold",
+                    color: part2TitleColor,
+                    margin: "sm"
+                  },
+                  {
+                    type: "text",
+                    text: evalData.p2Feedback,
+                    size: "xs",
+                    color: "#475569",
+                    wrap: true
+                  }
+                ]
+              },
+              { type: "separator" },
+              {
+                type: "text",
+                text: activeQuiz.flexFooterText,
+                size: "xs",
+                color: "#64748b",
+                wrap: true
+              }
+            ]
+          }
+        }
+      };
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      if (msg) toast.innerText = msg;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3500);
+    }
+
+    async function handleShareResult() {
+      const shareBtn = document.getElementById("share-btn");
+      const restartBtn = document.getElementById("restart-btn");
+      shareBtn.disabled = true;
+      restartBtn.disabled = true;
+      const originalBtnHtml = shareBtn.innerHTML;
+      shareBtn.innerText = "กำลังบันทึกข้อมูลและส่งผล...";
+
+      const evalData = getEvaluationData();
+
+      try {
+        await saveResultToSheet(evalData);
+
+        if (typeof liff !== "undefined" && liff.isInClient()) {
+          await liff.sendMessages([buildFlexMessage(evalData)]);
+          showToast("บันทึกผลและส่ง Flex Message เรียบร้อยแล้ว");
+          setTimeout(() => {
+            liff.closeWindow();
+          }, 600);
+        } else {
+          showToast("บันทึกผลลง Google Sheet แล้ว (เปิดในแอป LINE เพื่อส่ง Flex Message)");
+          shareBtn.disabled = false;
+          restartBtn.disabled = false;
+          shareBtn.innerHTML = originalBtnHtml;
+        }
+      } catch (err) {
+        console.error("Share / Save error:", err);
+        showToast("เกิดข้อผิดพลาดระหว่างส่งข้อมูล กรุณาลองใหม่อีกครั้ง");
+        shareBtn.disabled = false;
+        restartBtn.disabled = false;
+        shareBtn.innerHTML = originalBtnHtml;
+      }
+    }
+
+    function restartQuiz() {
+      currentIndex = 0;
+      scorePart1 = 0;
+      scorePart2 = 0;
+      resultView.style.display = "none";
+      quizView.style.display = "block";
+      loadQuestion();
+    }
+
+    initializeLiff();
+  </script>
+</body>
+</html>
